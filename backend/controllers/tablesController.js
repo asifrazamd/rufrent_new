@@ -123,7 +123,7 @@ const displayProperties = async (req, res) => {
 
     // Call the stored procedure
     const [results] = await db.execute(
-      `CALL agetJoinedData(?, ?, ?, ?);`,
+      `CALL getJoinedData(?, ?, ?, ?);`,
       [tableName, joinClauses, fieldNames, whereCondition]
     );
 
@@ -908,7 +908,7 @@ const getAllTransactionBasedOnId = async (req, res) => {
 
     // Call the stored procedure with the dynamic WHERE condition
     const [results] = await db.execute(
-      `CALL agetJoinedData(?, ?, ?, ?)`,
+      `CALL getJoinedData(?, ?, ?, ?)`,
       [tableName, joinClauses, fieldNames, whereCondition]
     );
 
@@ -944,7 +944,7 @@ const listOfFmBasedOnCommunityId=async(req,res)=>{
 
     // Call the stored procedure with the dynamic WHERE condition
     const [results] = await db.execute(
-      `CALL agetJoinedData(?, ?, ?, ?)`,
+      `CALL getJoinedData(?, ?, ?, ?)`,
       [tableName, joinClauses, fieldNames, whereCondition]
     );
 
