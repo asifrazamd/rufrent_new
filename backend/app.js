@@ -6,6 +6,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const tablesRoutes = require('./routes/tablesRoutes');
+const signupLoginRoutes=require('./routes/signupLoginRoutes');
 
 const app = express();
 
@@ -14,6 +15,8 @@ app.use(bodyParser.json());
 
 // Routes for table operations
 app.use('/api', tablesRoutes);
+
+app.use('/api',signupLoginRoutes);
 
 // Start the server
 const PORT = 5000; // Define the port number

@@ -69,7 +69,9 @@ const addRequest = async (req, res) => {
 const displayProperties = async (req, res) => {
   try {
     // Extract query parameters
-    const { property_id } = req.query;
+    const { property_id} = req.query;
+    //const offset = (page - 1) * limit;
+
 
     // Define table name, join clauses, and fields
     const tableName = 'dy_property dy';
@@ -137,6 +139,9 @@ const displayProperties = async (req, res) => {
         ? `Details for property ID: ${property_id}`
         : `All property details`,
       results: results[0],  // Ensure you return the first result (the data)
+      page: parseInt(page),
+      limit: parseInt(limit),
+
     });
 
   } catch (err) {
@@ -1044,7 +1049,7 @@ const listOfFmBasedOnCommunityId=async(req,res)=>{
     }
   };*/
 
-  const getRecords = async (req, res) => {
+ const getRecords = async (req, res) => {
     const { tbl_name, field_names, where_condition } = req.query;
     //const { tbl_name, field_names, where_condition } = req.body;
 
@@ -1117,7 +1122,7 @@ const listOfFmBasedOnCommunityId=async(req,res)=>{
         ['dy_transactions', fieldValuePairs, whereCondition]
       );
   
-      res.status(200).json({
+      res.status(201).json({
         message: 'Transaction updated successfully',
         result,
       });

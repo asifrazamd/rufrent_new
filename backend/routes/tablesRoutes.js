@@ -5,8 +5,10 @@
 
 const express = require('express');
 const router = express.Router();
-const { addRequest,displayProperties,getAllTransactionBasedOnId,listOfFmBasedOnCommunityId, getRecords,updateTransaction} = require('../controllers/tablesController');
+const { addRequest,displayProperties,getAllTransactionBasedOnId,listOfFmBasedOnCommunityId,updateTransaction} = require('../controllers/tablesController');
 const {addNewRecord}=require('../utils/addNewRecord');
+const {getRecords}=require('../utils/getRecords');
+const {updateRecords}=require('../utils/updateRecords');
 
 /**
  * POST /api/tables/addNewRecord
@@ -37,6 +39,8 @@ router.get('/FmList',listOfFmBasedOnCommunityId);
 router.get('/getRecords',getRecords);
 
 router.put('/updatetranscationsstatus',updateTransaction);
+
+router.put('/updateRecords',updateRecords);
 
 
 
