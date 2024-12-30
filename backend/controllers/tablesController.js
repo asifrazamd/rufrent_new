@@ -1,67 +1,43 @@
 const db = require("../config/db"); // Database db
 //const { redis } = require("../config/redis");
+const { updateRecords } = require('../utils/updateRecords'); // Adjust the path as needed
 
 
-/**
- * Add a new record to the database using a stored procedure.
- * 
- * @param {Object} req - The HTTP request object.
- * @param {Object} req.body - The body of the request.
- * @param {string} req.body.tableName - The name of the table.
- * @param {string} req.body.fieldNames - The names of the fields (comma-separated).
- * @param {string} req.body.fieldValues - The values for the fields (comma-separated).
- * @param {Object} res - The HTTP response object.
- */
-/*const addNewRecord = async (req, res) => {
-  const { tableName, fieldNames, fieldValues } = req.body;
 
-  // Validate input
-  if (!tableName || !fieldNames || !fieldValues) {
-    return res.status(400).json({ error: 'Missing required fields.' });
-  }
-
-
-  try {
-    // Execute the stored procedure
-    const [results] = await db.query(`CALL addNewRecord(?, ?, ?)`, [tableName, fieldNames, fieldValues]);
-
-    // Send success response
-    res.status(200).json({
-      message: 'Record added successfully',
-      results,
-    });
-  } catch (err) {
-    console.error('Error executing stored procedure:', err);
-
-    // Send error response
-    res.status(500).json({
-      error: 'Database error occurred while executing the stored procedure.',
-      details: err.message,
-    });
-  }
-};*/
 
 const addRequest = async (req, res) => {
+  // Extract user_id and property_id from the request body
   const { user_id, property_id } = req.body;
 
+  // Validate the input: Ensure both user_id and property_id are provided
   if (!user_id || !property_id) {
     return res.status(400).json({ error: 'user_id and property_id are required.' });
   }
+
+  // Get a database connection from the connection pool
   const connection = await db.getConnection();
   try {
-    // Call the stored procedure to update transaction status
-    const [result] = await connection.execute('CALL AssignRmToTransaction(?, ?)', [user_id, property_id]);
+    // Call the stored procedure to assign a relationship manager (RM) to the transaction
+    const [result] = await connection.execute(
+      'CALL AssignRmToTransaction(?, ?)', // Stored procedure name
+      [user_id, property_id]              // Parameters to pass to the stored procedure
+    );
+
+    // Send a success response with the result
     res.status(201).json({
       message: 'Transaction assigned successfully.',
       result,
     });
   } catch (error) {
+    // Log the error and send an error response
     console.error('Error assigning transaction:', error.message);
     res.status(500).json({ error: 'An error occurred while assigning the transaction.' });
   } finally {
+    // Ensure the database connection is released back to the pool
     connection.release();
   }
 };
+
 
 
 
@@ -139,8 +115,6 @@ const displayProperties = async (req, res) => {
         ? `Details for property ID: ${property_id}`
         : `All property details`,
       results: results[0],  // Ensure you return the first result (the data)
-      page: parseInt(page),
-      limit: parseInt(limit),
 
     });
 
@@ -172,251 +146,12 @@ const displayProperties = async (req, res) => {
 
 
 
-/*const displayProperties=async(req,res)=>{
-    const { page = 1, limit = 10 } = req.query;
-
-      // Input values for the stored procedure
-  const Sc_Tbl_Name = "dy_property"; // Main table name
-  const Jn_Tbl_1_Name = "st_prop_type";
-  const Jn_Tbl_2_name = "st_home_type";
-  const Jn_Tbl_3_name = "st_prop_desc ";
-  const Jn_Tbl_4_name = "st_community";
-  const Jn_Tbl_5_name = "st_beds";
-  const Jn_Tbl_6_name = "st_baths";
-  const Jn_Tbl_7_name = "st_balcony";
-  const Jn_Tbl_8_name = "st_tenant_eat_pref";
-  const Jn_Tbl_9_name = "st_parking_count";
-  const Jn_Tbl_10_name = "st_deposit_range";
-  const Jn_Tbl_11_name = "st_maintenance";
-  const Jn_Tbl_12_name = "st_tenant";
-  const Jn_Cnd_1 = "dy_property.prop_type_id = st_prop_type.id"; // Join condition 1
-  const Jn_Cnd_2 = "dy_property.home_type_id = st_home_type.id";
-  const Jn_Cnd_3 = "dy_property.prop_desc_id = st_prop_desc.id";
-  const Jn_Cnd_4 = "dy_property.community_id = st_community.id";
-  const Jn_Cnd_5 = "dy_property.no_beds = st_beds.id";
-  const Jn_Cnd_6 = "dy_property.no_baths = st_baths.id";
-  const Jn_Cnd_7 = "dy_property.no_balconies = st_balcony.id";
-  const Jn_Cnd_8 = "dy_property.tenant_eat_pref_id = st_tenant_eat_pref.id";
-  const Jn_Cnd_9 = "dy_property.parking_count_id = st_parking_count.id";
-  const Jn_Cnd_10 = "dy_property.deposit_range = st_deposit_range.id";
-  const Jn_Cnd_11 = "dy_property.maintenance_id = st_maintenance.id"; 
-  const Jn_Cnd_12 = "dy_property.tenant_type_id = st_tenant.id"; //
 
 
-  const Jn_Typ = "LEFT JOIN"; // Join type (INNER, LEFT, RIGHT)
-  const Fld_Nms = `dy_property.id,
-  dy_property.user_id,
-  dy_property.prop_type_id,
-  dy_property.home_type_id,
-  dy_property.prop_desc_id,
-  dy_property.community_id,
-  dy_property.no_beds,
-  dy_property.no_baths,
-  dy_property.no_balconies,
-  dy_property.no_tenant_type_id,
-  dy_property.tenant_eat_pref_id,
-  dy_property.parking_count_id,
-  dy_property.deposit_range_id,
-  dy_property.maintenance_id`;
-  try {
-    // Calculate offset for pagination
-    const offset = (page - 1) * limit;
-
-    // First query to get the total count of properties (without pagination)
-    const [totalCountRows] = await db.query(
-      `SELECT COUNT(*) AS total FROM dy_property`
-    );
-    const totalProperties = totalCountRows[0].total;
-
-    // Call the stored procedure to fetch paginated data
-    const [rows] = await db.query(
-      `CALL getJoinedData(?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-      [Sc_Tbl_Name,
-        Jn_Tbl_1_Name,
-        Jn_Tbl_2_name,
-        Jn_Tbl_3_name,
-        Jn_Tbl_4_name,
-        Jn_Tbl_5_name,
-        Jn_Tbl_6_name,
-        Jn_Tbl_7_name,
-        Jn_Tbl_8_name,
-        Jn_Tbl_9_name,
-        Jn_Tbl_10_name,
-        Jn_Tbl_11_name,
-        Jn_Tbl_12_name,
-        Jn_Tbl_1_Name,
-        Jn_Cnd_1,
-        Jn_Cnd_2,
-        Jn_Cnd_3,
-        Jn_Cnd_4,
-        Jn_Cnd_5,
-        Jn_Cnd_6,
-        Jn_Cnd_7,
-        Jn_Cnd_8,
-        Jn_Cnd_9,
-        Jn_Cnd_10,
-        Jn_Cnd_11,
-        Jn_Cnd_12,
-        Jn_Typ,
-        Fld_Nms
-]
-    );
-
-    const properties = rows[0]; // The result of the stored procedure
-
-    // Apply pagination
-    const paginatedProperties = properties.slice(offset, offset + parseInt(limit));
-
-    // Response
-    res.json({
-      message: "Properties retrieved successfully",
-      totalProperties,
-      page: parseInt(page),
-      limit: parseInt(limit),
-      properties: paginatedProperties,
-    });
-  } catch (error) {
-    console.error("Error fetching properties:", error);
-    res.status(500).json({ message: "An error occurred while retrieving properties." });
-  }
 
 
-}*/
-/*const displayProperties = async (req, res) => {
-  try {
-    const mainTable = "dy_property"; // Main table name
-    const joinType = "LEFT"; // Join type (INNER, LEFT, RIGHT)
-    const propertyId = req.query.id; // Get the id from the query parameters
 
-    // Define join configurations
-    const joins = [
-      {
-        joinTable: "dy_user",
-        joinCondition: "dy_property.user_id=dy_user.id",
-        fields: "dy_property.id, dy_user.user_name" // Include dy_property.id
-      },
-      {
-        joinTable: "st_prop_type",
-        joinCondition: "dy_property.prop_type_id=st_prop_type.id",
-        fields: "st_prop_type.prop_type"
-      },
-      {
-        joinTable: "st_home_type",
-        joinCondition: "dy_property.home_type_id=st_home_type.id",
-        fields: "st_home_type.home_type"
-      },
-      {
-        joinTable: "st_prop_desc",
-        joinCondition: "dy_property.prop_desc_id=st_prop_desc.id",
-        fields: "st_prop_desc.prop_desc"
-      },
-      {
-        joinTable: "st_tenant",
-        joinCondition: "dy_property.tenant_type_id=st_tenant.id",
-        fields: "st_tenant.tenant_type"
-      },
-      {
-        joinTable: "st_parking_type",
-        joinCondition: "dy_property.parking_type_id=st_parking_type.id",
-        fields: "st_parking_type.parking_type"
-      },
-      {
-        joinTable: "st_maintenance",
-        joinCondition: "dy_property.maintenance_id=st_maintenance.id",
-        fields: "st_maintenance.maintenance_type"
-      },
-      {
-        joinTable: "st_community", // Community join with full details
-        joinCondition: "dy_property.community_id=st_community.id",
-        fields: "st_community.id, st_community.name, st_community.map_url, st_community.total_area, st_community.open_area, st_community.nblocks, st_community.nfloors_per_block, st_community.nhouses_per_floor, st_community.address, st_community.builder_id, st_community.totflats, st_community.status"
-      }
-    ];
 
-    // Fetch data for each join
-    const results = await Promise.all(
-      joins.map(join =>
-        db.query(`CALL getJoinedData(?, ?, ?, ?, ?)`, [
-          mainTable,
-          join.joinTable,
-          join.joinCondition,
-          joinType,
-          join.fields
-        ])
-      )
-    );
-
-    // Extract and flatten the data for each join
-    let propertyData = results[0][0][0]; // Include and sort property data by `id`
-    console.log("pr",propertyData);
-    let propTypes = results[1][0][0].sort((a, b) => a.id - b.id);
-    console.log("propty",propTypes)
-    const homeTypes = results[2][0][0].sort((a, b) => a.id - b.id);
-    const propDescs = results[3][0][0].sort((a, b) => a.id - b.id);
-    const tenantTypes = results[4][0][0].sort((a, b) => a.id - b.id);
-    const parkingTypes = results[5][0][0].sort((a, b) => a.id - b.id);
-    const maintenanceNames = results[6][0][0].sort((a, b) => a.id - b.id);
-    const communityDetails = results[7][0][0].sort((a, b) => a.id - b.id); // Full community details
-
-    // Debugging logs to inspect fetched data
-    // console.log("Property Data:", propertyData);
-    // console.log("Prop Types:", propTypes);
-    // console.log("Home Types:", homeTypes);
-    // console.log("Property Descriptions:", propDescs);
-    // console.log("Tenant Types:", tenantTypes);
-    // console.log("Parking Types:", parkingTypes);
-    // console.log("Maintenance Types:", maintenanceNames);
-    // console.log("Community Details:", communityDetails);
-
-    // Combine all data into a single structure and order by property.id
-    let combinedData = propertyData.map((property, index) => {
-      // Find the matching community for each property by community_id
-      const community = communityDetails.find(community => community.id === property.community_id);
-      
-      return {
-        id: property.id, // Access dy_property ID
-        user_name: property.user_name,
-        prop_type: propTypes[index]?.prop_type || null,
-        home_type: homeTypes[index]?.home_type || null,
-        prop_desc: propDescs[index]?.prop_desc || null,
-        tenant_type: tenantTypes[index]?.tenant_type || null,
-        parking_type: parkingTypes[index]?.parking_type || null,
-        maintenance: maintenanceNames[index]?.maintenance_type || null,
-        community: community || null, // Find matching community based on community_id
-        no_beds: property.no_beds,
-        no_baths: property.no_baths,
-        no_balconies: property.no_balconies,
-        tenant_eat_pref: property.tenant_eat_pref_id, // Update if join needed
-        parking_count: property.parking_count_id, // Update if join needed
-        deposit_range: property.deposit_range_id, // Update if join needed
-        gender_pref: property.gender_pref,
-        availabl_date: property.availabl_date,
-        current_status: property.current_status,
-        tower_no: property.tower_no,
-        floor_no: property.floor_no,
-        flat_no: property.flat_no,
-        images_location: property.images_location,
-        rec_add_time: property.rec_add_time,
-        rec_last_update_time: property.rec_last_update_time,
-        rental_low: property.rental_low,
-        rental_high: property.rental_high
-      };
-    }).sort((a, b) => a.id - b.id); // Ensure data is ordered by `id`
-
-    // If an id is provided, filter the data for that specific id
-    if (propertyId) {
-      combinedData = combinedData.filter(property => property.id === parseInt(propertyId));
-    }
-
-    // Debugging: Log the combined data
-    //console.log("Combined Data:", combinedData);
-
-    // Send the combined data as JSON response
-    res.json(combinedData);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    res.status(500).json({ message: "An error occurred while retrieving data." });
-  }
-};*/
 
 
 
@@ -875,15 +610,15 @@ const getAllTransactionBasedOnId = async (req, res) => {
 
   try {
     // Dynamically determine the column and value to use in the WHERE clause
-    let idColumn = rm_id ? 'rm_id' : 'fm_id';
-    let idValue = rm_id || fm_id;
+    const idColumn = rm_id ? 'rm_id' : 'fm_id';
+    const idValue = rm_id || fm_id;
 
-    // Validate if the provided id is a number
+    // Validate if the provided ID is a number
     if (isNaN(idValue)) {
       return res.status(400).json({ error: `Invalid ${idColumn}.` });
     }
 
-    // Define the table name, join clauses, and fields
+    // Define the table name, join clauses, and fields for the query
     const tableName = 'dy_transactions dt';
     const joinClauses = `
       LEFT JOIN dy_user u1 ON dt.user_id = u1.id
@@ -906,12 +641,12 @@ const getAllTransactionBasedOnId = async (req, res) => {
       dt.schedule_time AS schedule_time
     `;
 
-    // Construct WHERE clause dynamically based on rm_id or fm_id
+    // Construct the WHERE clause dynamically based on rm_id or fm_id
     const whereCondition = rm_id
       ? `dt.rm_id = ${db.escape(rm_id)}`
       : `dt.fm_id = ${db.escape(fm_id)}`;
 
-    // Call the stored procedure with the dynamic WHERE condition
+    // Call the stored procedure to fetch joined data
     const [results] = await db.execute(
       `CALL getJoinedData(?, ?, ?, ?)`,
       [tableName, joinClauses, fieldNames, whereCondition]
@@ -922,32 +657,49 @@ const getAllTransactionBasedOnId = async (req, res) => {
       return res.status(404).json({ error: 'No records found for the provided rm_id or fm_id.' });
     }
 
-    // Return the retrieved results
+    // Determine the status category dynamically based on rm_id or fm_id
+    const statusCondition = rm_id
+      ? 'status_category="RMA" OR status_category="FMA"'
+      : 'status_category="FMA"';
+
+    // Fetch status records matching the status condition
+    const [status] = await db.query(
+      `CALL getRecordsByFields(?, ?, ?)`,
+      ['st_current_status', 'id,status_code', statusCondition]
+    );
+
+    // Return the retrieved results and statuses
     res.status(200).json({
-      message: `Retrieved successfully.`,
+      message: 'Retrieved successfully.',
       result: results[0],
+      status: status[0],
     });
 
   } catch (error) {
+    // Log the error and return a 500 response
     console.error('Error retrieving data:', error.message);
     return res.status(500).json({ error: 'An error occurred while retrieving the transaction data.' });
   }
 };
 
 
-const listOfFmBasedOnCommunityId=async(req,res)=>{
-  const {community_id}=req.query
+
+const listOfFmBasedOnCommunityId = async (req, res) => {
+  // Extract community_id from the query parameters
+  const { community_id } = req.query;
 
   try {
+    // Define the table name, join clauses, and fields for the query
     const tableName = `dy_rm_fm_com_map r`;
     const joinClauses = `LEFT JOIN dy_user u ON r.fm_id = u.id`;
-    const fieldNames = `r.fm_id,u.user_name AS fm_name`;
+    const fieldNames = `r.fm_id, u.user_name AS fm_name`;
+
+    // Construct the WHERE condition dynamically based on community_id
     const whereCondition = community_id
-    ? `r.community_id = ${db.escape(community_id)}`:'';
+      ? `r.community_id = ${db.escape(community_id)}`
+      : '';
 
-
-
-    // Call the stored procedure with the dynamic WHERE condition
+    // Call the stored procedure to fetch the joined data
     const [results] = await db.execute(
       `CALL getJoinedData(?, ?, ?, ?)`,
       [tableName, joinClauses, fieldNames, whereCondition]
@@ -960,15 +712,16 @@ const listOfFmBasedOnCommunityId=async(req,res)=>{
 
     // Return the retrieved results
     res.status(200).json({
-      message: `Retrieved successfully.`,
+      message: 'Retrieved successfully.',
       result: results[0],
     });
-} catch (error) {
+
+  } catch (error) {
+    // Log the error and send a 500 response
     console.error('Error fetching FM status data:', error.message);
     res.status(500).json({ error: 'An error occurred while fetching FM status data.' });
-}
-
-}
+  }
+};
 
 
 
@@ -1049,7 +802,7 @@ const listOfFmBasedOnCommunityId=async(req,res)=>{
     }
   };*/
 
- const getRecords = async (req, res) => {
+ /*const getRecords = async (req, res) => {
     const { tbl_name, field_names, where_condition } = req.query;
     //const { tbl_name, field_names, where_condition } = req.body;
 
@@ -1061,10 +814,10 @@ const listOfFmBasedOnCommunityId=async(req,res)=>{
       //const cacheKey = `records:${tbl_name}:${field_names}:${where_condition || 'all'}`;
   
       // Check Redis cache first
-      /*const cachedData = await redis.get(cacheKey);
+      const cachedData = await redis.get(cacheKey);
       if (cachedData) {
         return res.status(200).json(JSON.parse(cachedData));
-      }*/
+      }
   
       const whereCondition = where_condition || '';
   
@@ -1077,10 +830,10 @@ const listOfFmBasedOnCommunityId=async(req,res)=>{
     } catch (error) {
       return res.status(500).json({ message: 'Error getting records', error: error.message });
     }
-  };
+  };*/
 
 
-  const updateTransaction = async (req, res) => {
+  /*const updateTransaction = async (req, res) => {
     const { id, cur_stat_code, schedule_time, schedule_date, fm_id } = req.body; // Get transaction ID and new values from request body
   
     const connection = await db.getConnection();
@@ -1132,6 +885,56 @@ const listOfFmBasedOnCommunityId=async(req,res)=>{
     } finally {
       connection.release();
     }
+  };*/
+  const updateTransaction = async (req, res) => {
+    const { id, cur_stat_code, schedule_time, schedule_date, fm_id } = req.body;
+  
+    const connection = await db.getConnection();
+    try {
+      // First, get the current value of cur_stat_code
+      const [currentStatus] = await connection.query(
+        'SELECT cur_stat_code FROM dy_transactions WHERE id = ?',
+        [id]
+      );
+  
+      const currentStatCode = currentStatus[0]?.cur_stat_code;
+  
+      // Prepare the dynamic field-value pairs for the update
+      const fieldValuePairs = {};
+  
+      if (cur_stat_code) {
+        // If cur_stat_code is provided, set prev_stat_code to the current value of cur_stat_code
+        fieldValuePairs.prev_stat_code = currentStatCode;
+        fieldValuePairs.cur_stat_code = cur_stat_code;
+      }
+      if (schedule_time) {
+        fieldValuePairs.schedule_time = schedule_time;
+      }
+      if (schedule_date) {
+        fieldValuePairs.schedule_date = schedule_date;
+      }
+      if (fm_id) {
+        fieldValuePairs.fm_id = fm_id;
+      }
+  
+      // Prepare the WHERE condition
+      const whereCondition = `id = ${id}`;
+  
+      // Call the `updateRecords` utility
+      req.body = {
+        tbl_name: 'dy_transactions',
+        field_values_pairs: fieldValuePairs,
+        where_condition: whereCondition,
+      };
+  
+      // Call the `updateRecords` function
+      await updateRecords(req, res);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error updating transaction', error: error.message });
+    } finally {
+      connection.release();
+    }
   };
   
   
@@ -1139,4 +942,6 @@ const listOfFmBasedOnCommunityId=async(req,res)=>{
   
   
   
-module.exports = { addRequest,displayProperties,getAllTransactionBasedOnId,listOfFmBasedOnCommunityId,getRecords,updateTransaction};
+  
+  
+module.exports = { addRequest,displayProperties,getAllTransactionBasedOnId,listOfFmBasedOnCommunityId,updateTransaction};

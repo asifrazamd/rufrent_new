@@ -7,11 +7,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const tablesRoutes = require('./routes/tablesRoutes');
 const signupLoginRoutes=require('./routes/signupLoginRoutes');
+const cors=require('cors');
 
 const app = express();
 
 // Middleware to parse JSON request bodies
 app.use(bodyParser.json());
+app.use(cors())
 
 // Routes for table operations
 app.use('/api', tablesRoutes);

@@ -18,7 +18,6 @@ const signup = async (req, res) => {
             '*',
             `email_id = '${email_id}'`
         ]);
-        console.log("user",user);
 
         if (user && user.length > 0) {
             return res.status(409).json({ message: 'User already exists. Please login.' });
@@ -74,7 +73,7 @@ const login = async (req, res) => {
         const [role]=await db.query(`select role from st_role where id=?`,[user[0].role_id])
 
 
-        res.status(200).json({ message: 'Login successful.', token,id:user[0].id,userName:user[0].user_name,role:role[0].role });
+        res.status(200).json({ message: 'Login successful.', token,id:user[0].id,userName:user[0].user_name,role:role[0]});
     } catch (err) {
         console.error('Error during login:', err.message);
         res.status(500).json({ message: 'Internal server error.' });

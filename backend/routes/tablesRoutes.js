@@ -5,10 +5,17 @@
 
 const express = require('express');
 const router = express.Router();
-const { addRequest,displayProperties,getAllTransactionBasedOnId,listOfFmBasedOnCommunityId,updateTransaction} = require('../controllers/tablesController');
-const {addNewRecord}=require('../utils/addNewRecord');
-const {getRecords}=require('../utils/getRecords');
-const {updateRecords}=require('../utils/updateRecords');
+const { 
+    addRequest,
+    displayProperties,
+    getAllTransactionBasedOnId,
+    listOfFmBasedOnCommunityId,
+    updateTransaction 
+} = require('../controllers/tablesController');
+const { addNewRecord } = require('../utils/addNewRecord');
+const { getRecords } = require('../utils/getRecords');
+const { updateRecords } = require('../utils/updateRecords');
+const { deleteRecords } = require('../utils/deleteRecords');
 
 /**
  * POST /api/tables/addNewRecord
@@ -23,28 +30,114 @@ const {updateRecords}=require('../utils/updateRecords');
  * - Success: JSON object with a success message and query results.
  * - Error: JSON object with an error message.
  */
-router.post('/addNewRecord',addNewRecord);
+router.post('/addNewRecord', addNewRecord);
 
-router.post('/addRequest',addRequest);
+/**
+ * POST /api/tables/addRequest
+ * Route for adding a new request.
+ * 
+ * Request Body:
+ * - Contains the necessary fields for creating a request.
+ * 
+ * Response:
+ * - Success: JSON object with details of the created request.
+ * - Error: JSON object with an error message.
+ */
+router.post('/addRequest', addRequest);
 
+/**
+ * GET /api/tables/getAllProperties
+ * Route for retrieving all properties.
+ * 
+ * Response:
+ * - Success: JSON array of properties.
+ * - Error: JSON object with an error message.
+ */
+router.get('/getAllProperties', displayProperties);
 
-router.get('/getAllProperties',displayProperties);
+/**
+ * GET /api/tables/requests
+ * Route for fetching all transactions based on a given ID.
+ * 
+ * Query Parameters:
+ * - id (string): The ID for filtering transactions.
+ * 
+ * Response:
+ * - Success: JSON array of transactions.
+ * - Error: JSON object with an error message.
+ */
+router.get('/requests', getAllTransactionBasedOnId);
 
-router.get('/requests',getAllTransactionBasedOnId);
+/**
+ * GET /api/tables/FmList
+ * Route for retrieving a list of facility managers (FM) based on a community ID.
+ * 
+ * Query Parameters:
+ * - communityId (string): The ID of the community.
+ * 
+ * Response:
+ * - Success: JSON array of facility managers.
+ * - Error: JSON object with an error message.
+ */
+router.get('/FmList', listOfFmBasedOnCommunityId);
 
-//router.get('/status',getStatuses);
+/**
+ * GET /api/tables/getRecords
+ * Route for retrieving records from a specified table.
+ * 
+ * Query Parameters:
+ * - tableName (string): The name of the table.
+ * 
+ * Response:
+ * - Success: JSON array of records.
+ * - Error: JSON object with an error message.
+ */
+router.get('/getRecords', getRecords);
 
-router.get('/FmList',listOfFmBasedOnCommunityId);
+/**
+ * PUT /api/tables/updatetranscationsstatus
+ * Route for updating the status of a transaction.
+ * 
+ * Request Body:
+ * - transactionId (string): The ID of the transaction to update.
+ * - status (string): The new status.
+ * 
+ * Response:
+ * - Success: JSON object with details of the updated transaction.
+ * - Error: JSON object with an error message.
+ */
+router.put('/updatetranscationsstatus', updateTransaction);
 
-router.get('/getRecords',getRecords);
+/**
+ * PUT /api/tables/updateRecords
+ * Route for updating records in a specified table.
+ * 
+ * Request Body:
+ * - tableName (string): The name of the table.
+ * - updateFields (object): Key-value pairs of fields to update.
+ * - conditions (object): Conditions to identify records for update.
+ * 
+ * Response:
+ * - Success: JSON object with details of the updated records.
+ * - Error: JSON object with an error message.
+ */
+router.put('/updateRecords', updateRecords);
 
-router.put('/updatetranscationsstatus',updateTransaction);
+/**
+ * DELETE /api/tables/deleteRecords
+ * Route for deleting records from a specified table.
+ * 
+ * Request Body:
+ * - tableName (string): The name of the table.
+ * - conditions (object): Conditions to identify records for deletion.
+ * 
+ * Response:
+ * - Success: JSON object with details of the deleted records.
+ * - Error: JSON object with an error message.
+ */
+router.delete('/deleteRecords', deleteRecords);
 
-router.put('/updateRecords',updateRecords);
-
-
-
-
-
-
+/**
+ * Export the router to be used in other parts of the application.
+ */
 module.exports = router;
