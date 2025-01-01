@@ -23,7 +23,7 @@ const PropertyCard = ({ property }) => {
       <p className={`${tailwindStyles.heading} font-bold mb-2`}>
         Rs {property.price}/month
       </p>
-      <Link to="/fdc">
+      <Link to="/getAllProperties">
         <button
           className={`${tailwindStyles.secondaryButton} py-1 px-4 rounded `}
         >

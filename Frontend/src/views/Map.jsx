@@ -26,7 +26,7 @@ const NearbySearch = () => {
     const { lat, lng } = currentLocation;
 
     const service = new window.google.maps.places.PlacesService(
-      document.createElement("div")
+      document.createElement("div"),
     );
 
     const request = {
@@ -55,7 +55,9 @@ const NearbySearch = () => {
     <LoadScript googleMapsApiKey={API_KEY} libraries={["places"]}>
       <div>
         <h1>Google Nearby Search</h1>
-        <button onClick={() => handleSearch("entertainment")}>Entertainment</button>
+        <button onClick={() => handleSearch("entertainment")}>
+          Entertainment
+        </button>
         <button onClick={() => handleSearch("utilities")}>Utilities</button>
         <button onClick={() => handleSearch("restaurant")}>Restaurants</button>
       </div>

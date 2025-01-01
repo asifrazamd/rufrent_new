@@ -10,7 +10,8 @@ const {
     displayProperties,
     getAllTransactionBasedOnId,
     listOfFmBasedOnCommunityId,
-    updateTransaction 
+    updateTransaction, 
+    userActions
 } = require('../controllers/tablesController');
 const { addNewRecord } = require('../utils/addNewRecord');
 const { getRecords } = require('../utils/getRecords');
@@ -66,6 +67,9 @@ router.get('/getAllProperties', displayProperties);
  * - Success: JSON array of transactions.
  * - Error: JSON object with an error message.
  */
+
+
+router.get('/actions',userActions);
 router.get('/requests', getAllTransactionBasedOnId);
 
 /**

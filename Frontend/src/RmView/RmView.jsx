@@ -366,7 +366,12 @@ import { FaUserAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useRoleStore } from "../store/roleStore";
-import { getAllTransactionBasedOnId,listOfFmBasedOnCommunityId,updateTransaction,getRecords } from "../config/apiRoute";
+import {
+  getAllTransactionBasedOnId,
+  listOfFmBasedOnCommunityId,
+  updateTransaction,
+  getRecords,
+} from "../config/apiRoute";
 import SearchableDropdown from "./SearchableDropdown";
 
 const timeSlots = [
@@ -436,11 +441,11 @@ const RMView = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
- console.log("stat",rmStatuses)
- console.log("fm",fieldManagers)
+  console.log("stat", rmStatuses);
+  console.log("fm", fieldManagers);
 
   const navigate = useNavigate();
-  console.log("rqst",requestRmDetails)
+  console.log("rqst", requestRmDetails);
 
   // useEffect(() => {
   //   const fetchRmDashboardData = async () => {
@@ -448,10 +453,10 @@ const RMView = () => {
   //     setError(null);
   //     try {
   //       const responseData = await getAllTransactionBasedOnId(id);
-        
+
   //       // Ensure responseData is an object with a 'result' property that is an array
   //       const result = responseData?.result || [];
-  
+
   //       // Set the data correctly based on the API response structure
   //       setRequestRmDetails(result);
 
@@ -462,51 +467,52 @@ const RMView = () => {
 
   //   // Handle curr_stat_code if applicable
   //   setRmStatuses(result.length > 0 ? result[0].curr_stat_code : []);
-        
+
   //       console.log("res", responseData);
-  
+
   //     } catch (err) {
   //       setError(err.response?.data?.message || "Failed to fetch data");
   //     } finally {
   //       setLoading(false);
   //     }
   //   };
-  
+
   //   fetchRmDashboardData();
   // }, [id]);
-  
+
   useEffect(() => {
     const fetchRmDashboardData = async () => {
       setLoading(true);
       setError(null);
       try {
         const responseData = await getAllTransactionBasedOnId(id); // Replace null with fmId if needed
-  
+
         // Ensure responseData is an object with a 'result' property that is an array
         const result = responseData?.result || [];
-  
+
         // Set the data correctly based on the API response structure
         setRequestRmDetails(result);
-  
+
         // Extract community_name from the result array
-        const communities = result.map((item) => item.community_name).filter(Boolean);
+        const communities = result
+          .map((item) => item.community_name)
+          .filter(Boolean);
         setRmCommunities(communities);
-  
+
         // Extract unique statuses from the result array
         // const statuses = [
         //   ...new Set(result.map((item) => item.curr_stat_code).filter(Boolean)), // Ensure uniqueness and no empty values
         // ];
         // setRmStatuses(statuses);
-  
+
         // console.log("Statuses for dropdown:", statuses);
-  
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch data");
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchRmDashboardData();
   }, [id]);
 
@@ -514,20 +520,18 @@ const RMView = () => {
     const fetchRmStatusData = async () => {
       setLoading(true);
       setError(null);
-  
+
       try {
-        
-       
         // Fetch status details using the getRecords utility
         const statusResponse = await getRecords(
           "st_current_status", // Table name
           "id,status_code", // Fields to fetch
-          'status_category=RMA' // No additional conditions; fetch all statuses
+          "status_category=RMA", // No additional conditions; fetch all statuses
         );
-  
+
         // Set the statuses
         setRmStatuses(statusResponse?.result || []);
-        console.log("rmStatus",statusResponse)
+        console.log("rmStatus", statusResponse);
       } catch (err) {
         // Handle errors and set error state
         setError(err.response?.data?.message || "Failed to fetch data");
@@ -535,26 +539,25 @@ const RMView = () => {
         setLoading(false);
       }
     };
-  
+
     fetchRmStatusData();
   }, [id]);
-  
-  
 
   useEffect(() => {
     if (rmCommunities.length === 0) return; // Ensure communities exist before fetching FM data
-  
+
     const fetchFmData = async () => {
       const currentCommId =
-        requestRmDetails[0]?.current_community_id || rmCommunities[0]?.community_id;
-  
+        requestRmDetails[0]?.current_community_id ||
+        rmCommunities[0]?.community_id;
+
       setLoading(true);
       setError(null);
-  
+
       try {
         // Fetch FM data based on the current community ID
         const fmData = await listOfFmBasedOnCommunityId(currentCommId);
-  
+
         // Update state with the fetched FM data
         setFieldManagers(fmData?.result || []); // Use `result` as per the provided example
         console.log("Fetched FM Data:", fmData);
@@ -566,28 +569,27 @@ const RMView = () => {
         setLoading(false);
       }
     };
-  
+
     fetchFmData();
   }, [rmCommunities, requestRmDetails]);
-  
 
   const handleInputChange = (transactionId, field, value) => {
     setRequestRmDetails((prevDetails) =>
       prevDetails.map((item) =>
         item.transaction_id === transactionId
           ? { ...item, [field]: value }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
   const handleSave = async (transactionId) => {
     const updatedRequest = requestRmDetails.find(
-      (item) => item.transaction_id === transactionId
+      (item) => item.transaction_id === transactionId,
     );
-  
+
     if (!updatedRequest) return;
-  
+
     try {
       const payload = {
         transactionId,
@@ -598,12 +600,12 @@ const RMView = () => {
           fm_id: parseInt(updatedRequest.field_manager),
         },
       };
-  
+
       console.log("payload...", payload);
-  
+
       // Use the provided function to update the transaction
       const response = await updateTransaction(transactionId, payload.status);
-  
+
       // Handle the response
       if (response) {
         alert("Request updated successfully!");
@@ -680,14 +682,12 @@ const RMView = () => {
               Select Community
             </option>
             {rmCommunities.map((eachCommunity, index) => (
-  <option
-    key={`${eachCommunity.community_id}-${index}`}
-    value={eachCommunity.community_id}
-  >
-    {eachCommunity.community_name || "Unnamed Community"}
-  </option>
-
-
+              <option
+                key={`${eachCommunity.community_id}-${index}`}
+                value={eachCommunity.community_id}
+              >
+                {eachCommunity.community_name || "Unnamed Community"}
+              </option>
             ))}
           </select>
         </div>
@@ -777,18 +777,17 @@ const RMView = () => {
                       ))}
                     </select> */}
 
-<SearchableDropdown
-  name="current_status"
-  options={Array.isArray(rmStatuses) ? rmStatuses : []} // Ensure rmStatuses is an array
-  value={each.curr_stat_code || ""}
-  onChange={handleInputChange}
-  placeholder="Search Status"
-  displayKey="status_code"
-  valueKey="id"
-  transactionId={each.transaction_id}
-  currentStatusId={each.curr_stat_code_id}
-/>
-
+                    <SearchableDropdown
+                      name="current_status"
+                      options={Array.isArray(rmStatuses) ? rmStatuses : []} // Ensure rmStatuses is an array
+                      value={each.curr_stat_code || ""}
+                      onChange={handleInputChange}
+                      placeholder="Search Status"
+                      displayKey="status_code"
+                      valueKey="id"
+                      transactionId={each.transaction_id}
+                      currentStatusId={each.curr_stat_code_id}
+                    />
                   </p>
                 </div>
 
@@ -807,7 +806,7 @@ const RMView = () => {
                         handleInputChange(
                           each.transaction_id,
                           "requestScheduled",
-                          e.target.value
+                          e.target.value,
                         )
                       }
                       disabled={!isEditable}
@@ -871,7 +870,7 @@ const RMView = () => {
                       handleInputChange(
                         each.transaction_id,
                         "field_manager",
-                        e.target.value
+                        e.target.value,
                       )
                     }
                   >

@@ -11,7 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
-rufrent_new
+/rufrent_new/
 
 # Editor directories and files
 .vscode/*

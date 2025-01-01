@@ -158,7 +158,89 @@
 // export default UserLandingView;
 
 // UserLandingView.js
-// eslint-disable-next-line no-unused-vars
+
+// import React, { useState, useEffect } from "react";
+// import Navbar from "./Navbar";
+// import FilterSection from "./FilterView";
+// import SuccessView from "./SuccessView";
+// import LoadingView from "./LoadingView";
+// import FailureView from "./FailureView";
+// import apiStatusConstants from "../utils/apiStatusConstants";
+// import { fetchProperties } from "../services/apiServices";
+
+// const UserLandingView = () => {
+//   const [apiResponse, setApiResponse] = useState({
+//     status: apiStatusConstants.initial,
+//     data: null,
+//     errorMsg: null,
+//   });
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [totalProperties, setTotalProperties] = useState(0);
+
+//   const pageLimit = 5;
+
+//   useEffect(() => {
+//     const getData = async () => {
+//       setApiResponse({
+//         status: apiStatusConstants.inProgress,
+//         data: null,
+//         errorMsg: null,
+//       });
+
+//       const result = await fetchProperties(currentPage, pageLimit);
+
+//       if (result.status === apiStatusConstants.success) {
+//         setApiResponse({
+//           status: result.status,
+//           data: result.data.properties,
+//           errorMsg: null,
+//         });
+//         setTotalProperties(result.data.totalProperties);
+//       } else {
+//         setApiResponse(result);
+//       }
+//     };
+
+//     getData();
+//   }, [currentPage]);
+
+//   const totalPages = Math.ceil(totalProperties / pageLimit);
+
+//   const renderListings = () => {
+//     switch (apiResponse.status) {
+//       case apiStatusConstants.inProgress:
+//         return <LoadingView />;
+//       case apiStatusConstants.success:
+//         return (
+//           <SuccessView
+//             apiResponse={apiResponse}
+//             currentPage={currentPage}
+//             totalPages={totalPages}
+//             setCurrentPage={setCurrentPage}
+//           />
+//         );
+//       case apiStatusConstants.failure:
+//         return <FailureView />;
+//       default:
+//         return null;
+//     }
+//   };
+
+//   return (
+//     <>
+//       <Navbar />
+//       <div className="px-4 mt-24">
+//         <div className="relative flex flex-col lg:flex-row justify-center gap-6">
+//           <FilterSection />
+//           {renderListings()}
+//         </div>
+//       </div>
+//     </>
+//   );
+// };
+
+// export default UserLandingView;
+
 import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import FilterSection from "./FilterView";
@@ -166,7 +248,7 @@ import SuccessView from "./SuccessView";
 import LoadingView from "./LoadingView";
 import FailureView from "./FailureView";
 import apiStatusConstants from "../utils/apiStatusConstants";
-import { fetchProperties } from "../services/apiServices";
+import { displayAllProperties } from "../config/apiRoute";
 
 const UserLandingView = () => {
   const [apiResponse, setApiResponse] = useState({
@@ -187,17 +269,27 @@ const UserLandingView = () => {
         errorMsg: null,
       });
 
-      const result = await fetchProperties(currentPage, pageLimit);
+      try {
+        // Directly using displayProperties to fetch data
+        const result = await displayAllProperties(currentPage, pageLimit);
 
-      if (result.status === apiStatusConstants.success) {
+        if (result.status === apiStatusConstants.success) {
+          setApiResponse({
+            status: result.status,
+            data: result.data.results, // Access results array from the response
+            errorMsg: null,
+          });
+          setTotalProperties(result.data.totalProperties); // Assuming totalProperties is part of the response
+        } else {
+          setApiResponse(result); // Handle failure scenario
+        }
+      } catch (error) {
+        console.error("Error in fetching properties:", error);
         setApiResponse({
-          status: result.status,
-          data: result.data.properties,
-          errorMsg: null,
+          status: apiStatusConstants.failure,
+          data: null,
+          errorMsg: "Failed to fetch properties",
         });
-        setTotalProperties(result.data.totalProperties);
-      } else {
-        setApiResponse(result);
       }
     };
 
@@ -220,7 +312,7 @@ const UserLandingView = () => {
           />
         );
       case apiStatusConstants.failure:
-        return <FailureView />;
+        return <FailureView errorMsg={apiResponse.errorMsg} />;
       default:
         return null;
     }

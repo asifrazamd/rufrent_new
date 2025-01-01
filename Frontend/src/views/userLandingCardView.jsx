@@ -20,7 +20,8 @@ const PropertyListingCard = ({ propertyId, propDesc, homeType, propType }) => {
     if (jwtToken === undefined) {
       openModal();
     } else {
-      navigate(`$/getAllProperties${propertyId}`);
+      navigate(`/getAllProperties/${propertyId}`);
+
     }
   };
   return (

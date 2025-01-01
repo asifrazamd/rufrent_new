@@ -131,13 +131,13 @@ const AuthModal = ({ isOpen, onClose }) => {
       case "ArrowDown":
         e.preventDefault();
         setSuggestionFocusIndex((prev) =>
-          prev < emailDomains.length - 1 ? prev + 1 : 0
+          prev < emailDomains.length - 1 ? prev + 1 : 0,
         );
         break;
       case "ArrowUp":
         e.preventDefault();
         setSuggestionFocusIndex((prev) =>
-          prev > 0 ? prev - 1 : emailDomains.length - 1
+          prev > 0 ? prev - 1 : emailDomains.length - 1,
         );
         break;
       case "Enter":
@@ -229,7 +229,7 @@ const AuthModal = ({ isOpen, onClose }) => {
 
       // Set success message
       setMessage(
-        isLogin ? "Login successful!" : "Account created successfully!"
+        isLogin ? "Login successful!" : "Account created successfully!",
       );
 
       // Store the token if provided
@@ -290,7 +290,9 @@ const AuthModal = ({ isOpen, onClose }) => {
                   className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"
                 />
                 {errors.user_name && (
-                  <p className="text-red-500 text-xs mt-1">{errors.user_name}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.user_name}
+                  </p>
                 )}
               </div>
             )}

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 // import React, { useState, useRef, useEffect } from "react";
 
 // const SearchableDropdown = ({
@@ -255,7 +256,7 @@ const SearchableDropdown = ({
 
   // Find the currently selected option
   const selectedOption = options.find(
-    (opt) => opt[valueKey]?.toString() === value?.toString()
+    (opt) => opt[valueKey]?.toString() === value?.toString(),
   );
 
   // Set the search term based on the selected option
@@ -268,7 +269,7 @@ const SearchableDropdown = ({
   // Filter options based on the search term
   const filteredOptions = searchTerm
     ? options.filter((option) =>
-        option[displayKey].toLowerCase().includes(searchTerm.toLowerCase())
+        option[displayKey].toLowerCase().includes(searchTerm.toLowerCase()),
       )
     : options;
 
@@ -319,13 +320,13 @@ const SearchableDropdown = ({
     switch (e.key) {
       case "ArrowDown":
         setHighlightedIndex((prev) =>
-          prev + 1 >= filteredOptions.length ? 0 : prev + 1
+          prev + 1 >= filteredOptions.length ? 0 : prev + 1,
         );
         e.preventDefault();
         break;
       case "ArrowUp":
         setHighlightedIndex((prev) =>
-          prev - 1 < 0 ? filteredOptions.length - 1 : prev - 1
+          prev - 1 < 0 ? filteredOptions.length - 1 : prev - 1,
         );
         e.preventDefault();
         break;
@@ -368,7 +369,7 @@ const SearchableDropdown = ({
   useEffect(() => {
     if (isOpen && highlightedIndex >= 0) {
       const optionElement = document.getElementById(
-        `option-${highlightedIndex}`
+        `option-${highlightedIndex}`,
       );
       if (optionElement) {
         optionElement.scrollIntoView({ block: "nearest" });
@@ -452,7 +453,7 @@ const SearchableDropdown = ({
                   >
                     {option[displayKey]}
                   </div>
-                )
+                ),
             )
           ) : (
             <div className="p-2 text-gray-500">No results found</div>

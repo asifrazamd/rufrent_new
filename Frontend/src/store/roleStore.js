@@ -11,5 +11,5 @@ export const useRoleStore = create(
     setUserName: (name) => set({ userName: name }),
     clearRole: () => set({ role: null }),
     clearId: () => set({ id: null }),
-  }))
+  })),
 );

@@ -355,6 +355,7 @@ import apiStatusConstants from "../utils/apiStatusConstants";
 import LoadingView from "./LoadingView";
 import FailureView from "./FailureView";
 import Navbar from "./Navbar";
+import { displayProperties } from "../config/apiRoute";
 
 import { useRoleStore } from "../store/roleStore";
 
@@ -371,6 +372,8 @@ const FullDetailCard = () => {
   const propertyId = local.propertyId;
 
   const user_id = id; // Replace this with actual user ID from your authentication logic
+  console.log("propertyId:", propertyId);
+console.log("user_id:", user_id);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -380,14 +383,20 @@ const FullDetailCard = () => {
         errorMsg: null,
       });
 
-      const api = `http://localhost:5000/api/propertyDetails?property_id=${propertyId}`;
+     // const response = `http://localhost:5000/api/propertyDetails?property_id=${propertyId}`;
 
       try {
-        const response = await axios.get(api);
-
+        const propertyId = 1;
+        const response = await displayProperties(propertyId);
+        console.log("response",response.data)
+        if (response.status === apiStatusConstants.success) {
+          console.log("Specific Property:", response.data.results[0]); // Should log details of property with ID 1
+        } else {
+          console.error("Error:", response.errorMsg);
+        }
         setApiResponse({
           status: apiStatusConstants.success,
-          data: response.data, // Adjust based on your API response structure
+          data: response.data.results[0], // Adjust based on your API response structure
           errorMsg: null,
         });
       } catch (error) {
@@ -400,7 +409,7 @@ const FullDetailCard = () => {
     };
 
     fetchData();
-  }, [id]); // Added dependency `id` to re-fetch data when `id` changes
+  }, [propertyId]); // Added dependency `id` to re-fetch data when `id` changes
 
   // const [isAgreementModalOpen, setIsAgreementModalOpen] = useState(false);
 
@@ -434,6 +443,7 @@ const FullDetailCard = () => {
       nbaths,
       rental_high,
     } = apiResponse.data;
+    console.log("...",apiResponse.data)
     return (
       <div className="mt-16 container mx-auto p-4">
         <div className="bg-gray-200 p-6 rounded-lg shadow-md mt-6">

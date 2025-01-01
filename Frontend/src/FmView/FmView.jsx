@@ -64,7 +64,7 @@ const FMView = () => {
 
   const handleSave = async (transactionId) => {
     const updatedRequest = requestFmDetails.find(
-      (item) => item.transaction_id === transactionId
+      (item) => item.transaction_id === transactionId,
     );
 
     if (!updatedRequest) return;
@@ -79,7 +79,7 @@ const FMView = () => {
 
       const response = await axios.put(
         `${apiUrl}/updatetranscationsstatus`,
-        payload
+        payload,
       );
 
       if (response.status === 201) {

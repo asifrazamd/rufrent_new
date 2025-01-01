@@ -14,7 +14,13 @@ const SuccessView = ({
   //console.log(apiResponse);
   return (
     <div className="lg:w-3/4 space-y-6 mb-20">
-    
+      <div className="w-3/4">
+        <input
+          type="text"
+          className="form-control border border-gray-300 rounded-md px-2 py-1 lg:ml-36 xl:ml-44"
+          placeholder="Search Properties..."
+        />
+      </div>
       {apiResponse.data.map((property) => (
         <PropertyListingCard
           key={property.id}

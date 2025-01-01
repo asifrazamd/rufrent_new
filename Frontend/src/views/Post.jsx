@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
-import { addNewRecord,getRecords } from "../config/apiRoute";
+import { addNewRecord, getRecords } from "../config/apiRoute";
 import tailwindStyles from "../utils/tailwindStyles";
 import SearchableDropdown from "./SearchDropdownView";
 
@@ -61,7 +61,7 @@ const PostPropertiesView = () => {
   const [builderError, setBuilderError] = useState(null);
   const [communityError, setCommunityError] = useState(null);
   const [isLoadingPropType, setIsLoadingPropType] = useState(false);
-  const [propTypeError,setPropTypeError]=useState(null);
+  const [propTypeError, setPropTypeError] = useState(null);
   const [bedrooms, setBedrooms] = useState([]);
   const [bathrooms, setBathrooms] = useState([]);
   const [balcony, setBalcony] = useState([]);
@@ -75,35 +75,35 @@ const PostPropertiesView = () => {
   const totalSteps = 3;
   const [imagePreviews, setImagePreviews] = useState([]);
   const [modalImage, setModalImage] = useState(null);
-  const [balconyError,setbalconyError]=useState(null);
+  const [balconyError, setbalconyError] = useState(null);
   const [isLoadingBalcony, setIsLoadingBalcony] = useState(false);
-  const [bathroomsError,setbathroomsError]=useState(null);
+  const [bathroomsError, setbathroomsError] = useState(null);
   const [isLoadingBathrooms, setIsLoadingBathrooms] = useState(false);
-  const [bedroomsError,setbedroomsError]=useState(null);
+  const [bedroomsError, setbedroomsError] = useState(null);
   const [isLoadingBedrooms, setIsLoadingBedrooms] = useState(false);
-  const[floorrange,setfloorrange]=useState([]);
-  const [floorrangeError,setfloorrangeError]=useState(null);
+  const [floorrange, setfloorrange] = useState([]);
+  const [floorrangeError, setfloorrangeError] = useState(null);
   const [isLoadingFloorrange, setIsLoadingFloorrange] = useState(false);
-  const[homeType,sethomeType]=useState([]);
-  const [hometypeError,sethometypeError]=useState(null);
+  const [homeType, sethomeType] = useState([]);
+  const [hometypeError, sethometypeError] = useState(null);
   const [isLoadingHometype, setIsLoadingHometype] = useState(false);
-  const[parkingCount,setparkingCount]=useState([]);
-  const [parkingcountError,setparkingcountError]=useState(null);
+  const [parkingCount, setparkingCount] = useState([]);
+  const [parkingcountError, setparkingcountError] = useState(null);
   const [isLoadingParkingcount, setIsLoadingParkingcount] = useState(false);
-  const[propDesc,setpropDesc]=useState([]);
-  const [propDescError,setpropDescError]=useState(null);
+  const [propDesc, setpropDesc] = useState([]);
+  const [propDescError, setpropDescError] = useState(null);
   const [isLoadingPropdesc, setIsLoadingPropdesc] = useState(false);
-  const[propType,setPropType]=useState([]);
-  
+  const [propType, setPropType] = useState([]);
+
   const [isLoadingProptype, setIsLoadingProptype] = useState(false);
-  const[rentalRange,setrentalRange]=useState([]);
-  const [rentalRangeError,setrentalRangeError]=useState(null);
+  const [rentalRange, setrentalRange] = useState([]);
+  const [rentalRangeError, setrentalRangeError] = useState(null);
   const [isLoadingRentalRange, setIsLoadingRentalRange] = useState(false);
-  const[tenant,settenant]=useState([]);
-  const [tenantError,settenantError]=useState(null);
+  const [tenant, settenant] = useState([]);
+  const [tenantError, settenantError] = useState(null);
   const [isLoadingTenant, setIsLoadingTenant] = useState(false);
-  const[tenantEat,settenantEat]=useState([]);
-  const [tenantEatError,settenantEatError]=useState(null);
+  const [tenantEat, settenantEat] = useState([]);
+  const [tenantEatError, settenantEatError] = useState(null);
   const [isLoadingTenantEat, setIsLoadingTenantEat] = useState(false);
   const [panels, setPanels] = useState([
     [
@@ -133,88 +133,86 @@ const PostPropertiesView = () => {
       },
       {
         label: "Prop-type",
-        name: "prop_type_id",
+        name: "prop_type",
         type: "dropdown",
         options: propType,
       },
       {
         label: "Home-Type",
-        name: "home_type_id",
+        name: "home_type",
         type: "dropdown",
-        options:homeType,
+        options: homeType,
       },
     ],
     [
       {
         label: "Prop-Desc",
-        name: "prop_desc_id",
+        name: "prop_desc",
         type: "dropdown",
         options: propDesc,
       },
-      { label: "Tower#", name: "tower_no", type: "text" },
-      { label: "Floor#", name: "floor_no", type: "number" },
-      { label: "Flat#", name: "flat_no", type: "text" },
-      { label: "Rental Price", name: "rental_low", type: "text" },
+      { label: "Tower#", name: "towerNumber", type: "text" },
+      { label: "Floor#", name: "floorNumber", type: "number" },
+      { label: "Flat#", name: "flatNumber", type: "text" },
+      { label: "Rental Price", name: "rentalPrice", type: "text" },
 
       {
         label: "Baths",
-        name: "no_baths",
+        name: "nbaths",
         type: "dropdown",
         options: bathrooms,
       },
-     
     ],
     [
       {
         label: "Balconies",
-        name: "no_balconies",
+        name: "nbalcony",
         type: "dropdown",
         options: balcony,
       },
       {
         label: "Parking",
-        name: "parking_count_id",
+        name: "parking_count",
         type: "dropdown",
         options: parkingCount,
       },
       {
         label: "Tenant-Type",
-        name: "tenant_type_id",
+        name: "tenant_type",
         type: "dropdown",
         options: tenant,
       },
       {
         label: "Eat-Pref",
-        name: "tenant_eat_pref_id",
+        name: "eat_pref",
         type: "dropdown",
         options: tenantEat,
       },
-      { label: "Upload Images", name: "images", type: "file" }
+      { label: "Upload Images", name: "images", type: "file" },
     ],
   ]);
-  console.log("hoine....",homeType)
-  console.log("pane",panels[0]);
+  console.log("hoine....", homeType);
   const [formData, setFormData] = useState({
-     prop_type_id:"", 
-     home_type_id:"", 
-     prop_desc_id:"",
-      community_id:"", 
-      no_beds:"", 
-      no_baths:"",
-       no_balconies:"",
-        tenant_type_id:"",
-         tenant_eat_pref_id:"",
-        
-           parking_count_id:"",
-          
-             current_status:"", 
-             tower_no:"", 
-             floor_no:"",
-              flat_no:"", 
-             rental_low:""
+    prop_type_id: "",
+    home_type_id: "",
+    prop_desc_id: "",
+    community_id: "",
+    no_beds: "",
+    no_baths: "",
+    no_balconies: "",
+    tenant_type_id: "",
+    tenant_eat_pref_id: "",
+
+    parking_count_id: "",
+
+    current_status: "",
+    tower_no: "",
+    floor_no: "",
+    flat_no: "",
+    rental_low: "",
   });
-  console.log("form",formData);
- //console.log(stateList)
+  console.log("form", formData);
+  //console.log(stateList)
   // Fetch state list when component mounts
   useEffect(() => {
     const fetchStateList = async () => {
@@ -222,12 +220,11 @@ const PostPropertiesView = () => {
       setStateError(null);
       try {
         // Fetching records from 'st_state' table with field names 'id,name'
-        const response = await getRecords('st_state', 'id,name');
-        
+        const response = await getRecords("st_state", "id,name");
+
         // Setting the state with the fetched data
         setStateList(response);
         //console.log("State list fetched:", response);
-        
       } catch (err) {
         // Handling the error
         setStateError("Failed to fetch state list. Please try again later.");
@@ -237,10 +234,10 @@ const PostPropertiesView = () => {
         setIsLoadingState(false);
       }
     };
-  
+
     fetchStateList();
   }, []); // Empty dependency array, so it runs once when the component mounts
-  
+
   // Fetch city list when state changes
   useEffect(() => {
     const fetchCityList = async () => {
@@ -248,8 +245,10 @@ const PostPropertiesView = () => {
       setCityError(null);
       try {
         // Fetching city list with the state_id parameter
-        const response = await getRecords('st_city', 'id,name', { state_id: formData.state });
-        console.log(formData.state)
+        const response = await getRecords("st_city", "id,name", {
+          state_id: formData.state,
+        });
+        console.log(formData.state);
         setCityList(response);
         console.log("City list fetched:", response);
       } catch (err) {
@@ -259,12 +258,12 @@ const PostPropertiesView = () => {
         setIsLoadingCity(false);
       }
     };
-  
+
     if (formData.state) {
       fetchCityList();
     }
   }, [formData.state]);
-  
+
   // Fetch builder list when city changes
   useEffect(() => {
     const fetchBuilderList = async () => {
@@ -276,11 +275,13 @@ const PostPropertiesView = () => {
       setIsLoadingBuilder(true);
       setBuilderError(null);
       try {
-        const response = await getRecords('st_builder', 'id,name', { city_id: formData.city });
+        const response = await getRecords("st_builder", "id,name", {
+          city_id: formData.city,
+        });
         setBuilderList(response);
       } catch (err) {
         setBuilderError(
-          "Failed to fetch builder list. Please try again later."
+          "Failed to fetch builder list. Please try again later.",
         );
         console.error("Error fetching builder list:", err);
       } finally {
@@ -301,12 +302,13 @@ const PostPropertiesView = () => {
       setIsLoadingCommunity(true);
       setCommunityError(null);
       try {
-        const response = await getRecords('st_community', 'id,name', { builder_id: formData.builder });
+        const response = await getRecords("st_community", "id,name", {
+          builder_id: formData.builder,
+        });
         setCommunityList(response);
-        
       } catch (err) {
         setCommunityError(
-          "Failed to fetch builder list. Please try again later."
+          "Failed to fetch builder list. Please try again later.",
         );
         console.error("Error fetching builder list:", err);
       } finally {
@@ -319,19 +321,16 @@ const PostPropertiesView = () => {
   // Fetch All Remaining Static Data
   useEffect(() => {
     const fetchPropertyTypeList = async () => {
-      
-  
       setIsLoadingPropType(true);
       setPropTypeError(null);
       try {
-        const response = await getRecords('st_prop_type', 'id,prop_type');
+        const response = await getRecords("st_prop_type", "id,prop_type");
         const data = response || [];
-        setPropType(data);
-        console.log("property",data)
-        
+        setPropType(Array.isArray(data) ? data : []);
+        console.log("property", data);
       } catch (err) {
         setPropTypeError(
-          "Failed to fetch property type list. Please try again later."
+          "Failed to fetch property type list. Please try again later.",
         );
         console.error("Error fetching property type list:", err);
       } finally {
@@ -340,344 +339,327 @@ const PostPropertiesView = () => {
     };
     fetchPropertyTypeList();
   }, []);
- // balcony
- useEffect(() => {
-  const fetchBalconyList = async () => {
-    
+  // balcony
+  useEffect(() => {
+    const fetchBalconyList = async () => {
+      setIsLoadingBalcony(true);
+      setbalconyError(null);
+      try {
+        const response = await getRecords("st_balcony", "id,nbalcony");
+        setBalcony(response);
+      } catch (err) {
+        setbalconyError(
+          "Failed to fetch balcony list. Please try again later.",
+        );
+        console.error("Error fetching balcony list:", err);
+      } finally {
+        setIsLoadingBalcony(false);
+      }
+    };
+    fetchBalconyList();
+  }, []);
 
-    setIsLoadingBalcony(true);
-    setbalconyError(null);
-    try {
-      const response = await getRecords('st_balcony', 'id,nbalcony');
-      setBalcony(response);
-      
-    } catch (err) {
-      setbalconyError(
-        "Failed to fetch balcony list. Please try again later."
-      );
-      console.error("Error fetching balcony list:", err);
-    } finally {
-      setIsLoadingBalcony(false);
-    }
-  };
-  fetchBalconyList();
-}, []);
+  //bathsroom
+  useEffect(() => {
+    const fetchBathroomsList = async () => {
+      setIsLoadingBathrooms(true);
+      setbathroomsError(null);
+      try {
+        const response = await getRecords("st_baths", "id,nbaths");
+        setBathrooms(response);
+      } catch (err) {
+        setbathroomsError(
+          "Failed to fetch bathrooms list. Please try again later.",
+        );
+        console.error("Error fetching bathrooms list:", err);
+      } finally {
+        setIsLoadingBathrooms(false);
+      }
+    };
+    fetchBathroomsList();
+  }, []);
+  //bedrooms
+  useEffect(() => {
+    const fetchBedroomsList = async () => {
+      setIsLoadingBedrooms(true);
+      setbedroomsError(null);
+      try {
+        const response = await getRecords("st_beds", "id,nbeds");
+        setBedrooms(response);
+        console.log("beds", response);
+      } catch (err) {
+        setbedroomsError(
+          "Failed to fetch bedrooms list. Please try again later.",
+        );
+        console.error("Error fetching bedrooms list:", err);
+      } finally {
+        setIsLoadingBedrooms(false);
+      }
+    };
+    fetchBedroomsList();
+  }, []);
+  //floor-range
+  useEffect(() => {
+    const fetchFloorRangeList = async () => {
+      setIsLoadingFloorrange(true);
+      setfloorrangeError(null);
+      try {
+        const response = await getRecords(
+          "st_floor_range",
+          "id,floor_lower_limit,floor_upper_limit",
+        );
+        setfloorrange(response);
+        console.log("floor", response);
+      } catch (err) {
+        setfloorrangeError(
+          "Failed to fetch floorrange list. Please try again later.",
+        );
+        console.error("Error fetching floorrange list:", err);
+      } finally {
+        setIsLoadingFloorrange(false);
+      }
+    };
+    fetchFloorRangeList();
+  }, []);
 
-//bathsroom
-useEffect(() => {
-  const fetchBathroomsList = async () => {
-    
+  // home_type
+  useEffect(() => {
+    const fetchHometypeList = async () => {
+      setIsLoadingHometype(true);
+      sethometypeError(null);
+      try {
+        const response = await getRecords("st_home_type", "id,home_type");
+        sethomeType(response);
 
-    setIsLoadingBathrooms(true);
-    setbathroomsError(null);
-    try {
-      const response = await getRecords('st_baths', 'id,nbaths');
-      setBathrooms(response);
-      
-    } catch (err) {
-      setbathroomsError(
-        "Failed to fetch bathrooms list. Please try again later."
-      );
-      console.error("Error fetching bathrooms list:", err);
-    } finally {
-      setIsLoadingBathrooms(false);
-    }
-  };
-  fetchBathroomsList();
-}, []);
-//bedrooms
-useEffect(() => {
-  const fetchBedroomsList = async () => {
-  
+        console.log(response);
+      } catch (err) {
+        sethometypeError(
+          "Failed to fetch hometype list. Please try again later.",
+        );
+        console.error("Error fetching hometype list:", err);
+      } finally {
+        setIsLoadingHometype(false);
+      }
+    };
+    fetchHometypeList();
+  }, []);
+  //console.log("home",homeType)
+  // parking-count
+  useEffect(() => {
+    const fetchParkingcountList = async () => {
+      setIsLoadingParkingcount(true);
+      setparkingcountError(null);
+      try {
+        const response = await getRecords(
+          "st_parking_count",
+          "id,parking_count",
+        );
+        setparkingCount(response);
+      } catch (err) {
+        setparkingcountError(
+          "Failed to fetch parkingcount list. Please try again later.",
+        );
+        console.error("Error fetching parkingcount list:", err);
+      } finally {
+        setIsLoadingParkingcount(false);
+      }
+    };
+    fetchParkingcountList();
+  }, []);
+  // prop-desc
+  useEffect(() => {
+    const fetchPropdescList = async () => {
+      setIsLoadingPropdesc(true);
+      setpropDescError(null);
+      try {
+        const response = await getRecords("st_prop_desc", "id,prop_desc");
+        setpropDesc(response);
+      } catch (err) {
+        setpropDescError(
+          "Failed to fetch propdesc list. Please try again later.",
+        );
+        console.error("Error fetching propdesc list:", err);
+      } finally {
+        setIsLoadingPropdesc(false);
+      }
+    };
+    fetchPropdescList();
+  }, []);
 
-    setIsLoadingBedrooms(true);
-    setbedroomsError(null);
-    try {
-      const response = await getRecords('st_beds', 'id,nbeds');
-      setBedrooms(response);
-      console.log("beds",response)
-      
-    } catch (err) {
-      setbedroomsError(
-        "Failed to fetch bedrooms list. Please try again later."
-      );
-      console.error("Error fetching bedrooms list:", err);
-    } finally {
-      setIsLoadingBedrooms(false);
-    }
-  };
-  fetchBedroomsList();
-}, []);
-//floor-range
-useEffect(() => {
-  const fetchFloorRangeList = async () => {
-  
+  // rental-range
+  useEffect(() => {
+    const fetchRentalRangeList = async () => {
+      setIsLoadingRentalRange(true);
+      setrentalRangeError(null);
+      try {
+        const response = await getRecords(
+          "st_rental_range",
+          "id,lower_limit,higher_limit",
+        );
+        setrentalRange(response);
+      } catch (err) {
+        setrentalRangeError(
+          "Failed to fetch rentalrange list. Please try again later.",
+        );
+        console.error("Error fetching rentalrange list:", err);
+      } finally {
+        setIsLoadingRentalRange(false);
+      }
+    };
+    fetchRentalRangeList();
+  }, []);
+  // tenant
+  useEffect(() => {
+    const fetchTenantList = async () => {
+      setIsLoadingTenant(true);
+      settenantError(null);
+      try {
+        const response = await getRecords("st_tenant", "id,tenant_type");
+        settenant(response);
+      } catch (err) {
+        settenantError("Failed to fetch tenant list. Please try again later.");
+        console.error("Error fetching tenant list:", err);
+      } finally {
+        setIsLoadingTenant(false);
+      }
+    };
+    fetchTenantList();
+  }, []);
+  // tenant-eat-pref
+  useEffect(() => {
+    const fetchTenantEatList = async () => {
+      setIsLoadingTenantEat(true);
+      settenantEatError(null);
+      try {
+        const response = await getRecords("st_tenant_eat_pref", "id,eat_pref");
+        settenantEat(response);
+      } catch (err) {
+        settenantEatError(
+          "Failed to fetch tenanteat list. Please try again later.",
+        );
+        console.error("Error fetching tenanteat list:", err);
+      } finally {
+        setIsLoadingTenantEat(false);
+      }
+    };
+    fetchTenantEatList();
+  }, []);
 
-    setIsLoadingFloorrange(true);
-    setfloorrangeError(null);
-    try {
-      const response = await getRecords('st_floor_range', 'id,floor_lower_limit,floor_upper_limit');
-      setfloorrange(response);
-      console.log("floor",response)
-      
-    } catch (err) {
-      setfloorrangeError(
-        "Failed to fetch floorrange list. Please try again later."
-      );
-      console.error("Error fetching floorrange list:", err);
-    } finally {
-      setIsLoadingFloorrange(false);
-    }
-  };
-  fetchFloorRangeList();
-}, []);
+  const handleInputChange = (e) => {
+    const { name, type, files } = e.target;
 
-// home_type
-useEffect(() => {
-  const fetchHometypeList = async () => {
-  
+    if (type === "file") {
+      const fileList = Array.from(files);
+      setFormData((prev) => ({
+        ...prev,
+        images: [...prev.images, ...fileList],
+      }));
+      const previews = fileList.map((file) => URL.createObjectURL(file));
+      setImagePreviews((prev) => [...prev, ...previews]);
+    } else {
+      const { value } = e.target;
 
-    setIsLoadingHometype(true);
-    sethometypeError(null);
-    try {
-      const response = await getRecords('st_home_type', 'id,home_type');
-      sethomeType(response);
-  
-      console.log(response)
-      
-    } catch (err) {
-      sethometypeError(
-        "Failed to fetch hometype list. Please try again later."
-      );
-      console.error("Error fetching hometype list:", err);
-    } finally {
-      setIsLoadingHometype(false);
-    }
-  };
-  fetchHometypeList();
-}, []);
-//console.log("home",homeType)
-// parking-count
-useEffect(() => {
-  const fetchParkingcountList = async () => {
-  
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        ...(name === "state" && {
+          city: "",
+          builder: "",
+          community: "",
+          prop_type: "",
+        }),
+        ...(name === "city" && { builder: "", community: "", prop_type: "" }),
+        ...(name === "builder" && { community: "", prop_type: "" }),
+      }));
 
-    setIsLoadingParkingcount(true);
-    setparkingcountError(null);
-    try {
-      const response = await getRecords('st_parking_count', 'id,parking_count');
-      setparkingCount(response);
-      
-    } catch (err) {
-      setparkingcountError(
-        "Failed to fetch parkingcount list. Please try again later."
-      );
-      console.error("Error fetching parkingcount list:", err);
-    } finally {
-      setIsLoadingParkingcount(false);
-    }
-  };
-  fetchParkingcountList();
-}, []);
-// prop-desc
-useEffect(() => {
-  const fetchPropdescList = async () => {
-  
+      // Check if prop_type has changed and update the panels
+      if (name === "prop_type") {
+        setPanels((prevPanels) => {
+          const updatedPanels = [...prevPanels];
+          console.log("panels", value);
+          // Clear out the second panel first
+          updatedPanels[1] = [];
 
-    setIsLoadingPropdesc(true);
-    setpropDescError(null);
-    try {
-      const response = await getRecords('st_prop_desc', 'id,prop_desc');
-      setpropDesc(response);
-      
-    } catch (err) {
-      setpropDescError(
-        "Failed to fetch propdesc list. Please try again later."
-      );
-      console.error("Error fetching propdesc list:", err);
-    } finally {
-      setIsLoadingPropdesc(false);
-    }
-  };
-  fetchPropdescList();
-}, []);
-
-
-// rental-range
-useEffect(() => {
-  const fetchRentalRangeList = async () => {
-  
-
-    setIsLoadingRentalRange(true);
-    setrentalRangeError(null);
-    try {
-      const response = await getRecords('st_rental_range', 'id,lower_limit,higher_limit');
-      setrentalRange(response);
-      
-    } catch (err) {
-      setrentalRangeError(
-        "Failed to fetch rentalrange list. Please try again later."
-      );
-      console.error("Error fetching rentalrange list:", err);
-    } finally {
-      setIsLoadingRentalRange(false);
-    }
-  };
-  fetchRentalRangeList();
-}, []);
-// tenant
-useEffect(() => {
-  const fetchTenantList = async () => {
-  
-
-    setIsLoadingTenant(true);
-    settenantError(null);
-    try {
-      const response = await getRecords('st_tenant', 'id,tenant_type');
-      settenant(response);
-      
-    } catch (err) {
-      settenantError(
-        "Failed to fetch tenant list. Please try again later."
-      );
-      console.error("Error fetching tenant list:", err);
-    } finally {
-      setIsLoadingTenant(false);
-    }
-  };
-  fetchTenantList();
-}, []);
-// tenant-eat-pref
-useEffect(() => {
-  const fetchTenantEatList = async () => {
-  
-
-    setIsLoadingTenantEat(true);
-    settenantEatError(null);
-    try {
-      const response = await getRecords('st_tenant_eat_pref', 'id,eat_pref');
-      settenantEat(response);
-      
-    } catch (err) {
-      settenantEatError(
-        "Failed to fetch tenanteat list. Please try again later."
-      );
-      console.error("Error fetching tenanteat list:", err);
-    } finally {
-      setIsLoadingTenantEat(false);
-    }
-  };
-  fetchTenantEatList();
-}, []);
-
-const handleInputChange = (e) => {
-  const { name, type, files } = e.target;
-
-  if (type === "file") {
-    const fileList = Array.from(files);
-    setFormData((prev) => ({
-      ...prev,
-      images: [...prev.images, ...fileList],
-    }));
-    const previews = fileList.map((file) => URL.createObjectURL(file));
-    setImagePreviews((prev) => [...prev, ...previews]);
-  } else {
-    const { value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-      ...(name === "state" && { city: "", builder: "", community: "", prop_type: "" }),
-      ...(name === "city" && { builder: "", community: "", prop_type: "" }),
-      ...(name === "builder" && { community: "", prop_type: "" }),
-    }));
-
-    // Check if prop_type has changed and update the panels
-    if (name === "prop_type") {
-      setPanels((prevPanels) => {
-        const updatedPanels = [...prevPanels];
-         console.log("panels",value)
-        // Clear out the second panel first
-        updatedPanels[1] = [];
-
-        // Add new fields based on the selected prop_type
-        if (value === 3) {
-          updatedPanels[1] = [
-            { label: "Unit#", name: "tower_no", type: "text" },
-            { label: "Rental Price", name: "rental_low", type: "text" },
-            {
-              label: "Prop-Desc",
-               name: "prop_desc_id",
-                  type: "dropdown",
-                   options: propDesc,
-                },
-            { label: "Baths", name: "no_baths", type: "dropdown", options: bathrooms },
-          ];
+          // Add new fields based on the selected prop_type
+          if (value === 3) {
+            updatedPanels[1] = [
+              { label: "Unit#", name: "unitNumber", type: "text" },
+              { label: "Rental Price", name: "rentalPrice", type: "text" },
+              {
+                label: "Prop-Desc",
+                name: "prop_desc",
+                type: "dropdown",
+                options: propDesc,
+              },
+              {
+                label: "Baths",
+                name: "nbaths",
+                type: "dropdown",
+                options: bathrooms,
+              },
+            ];
             // { label: "Rental Price", name: "rentalPrice", type: "text" },
             // { label: "Baths", name: "bathrooms", type: "dropdown", options: bathrooms },
-          
-        } else if (value === 1) {
-          updatedPanels[1] = [
-           
-            { label: "Tower#", name: "tower_no", type: "text" },
-            { label: "Floor#", name: "floor_no", type: "number" },
-            { label: "Flat#", name: "flat_no", type: "text" },
-            { label: "Rental Price", name: "rental_low", type: "text" },
-            {
-              label: "Prop-Desc",
-               name: "prop_desc_id",
-                  type: "dropdown",
-                   options: propDesc,
-                },
-            { label: "Baths", name: "no_baths", type: "dropdown", options: bathrooms },
-          ];
-          [
-            // { label: "Rental Price", name: "rentalPrice", type: "text" },
-            {
-              label: "Balconies",
-              name: "no_balconies",
-              type: "dropdown",
-              options: balcony,
-            },
-            {
-              label: "Parking",
-              name: "parking_count_id",
-              type: "dropdown",
-              options: parkingCount,
-            },
-            {
-              label: "Tenant-Type",
-              name: "tenant_type_id",
-              type: "dropdown",
-              options: tenant,
-            },
-            {
-              label: "Eat-Pref",
-              name: "tenant_eat_pref_id",
-              type: "dropdown",
-              options: tenantEat,
-            },
-            { label: "Upload Images", name: "images", type: "file" }
-          ]
-        }
-         setPanels(updatedPanels)
-        return updatedPanels;
-      });
+          } else if (value === 1) {
+            updatedPanels[1] = [
+              { label: "Tower#", name: "towerNumber", type: "text" },
+              { label: "Floor#", name: "floorNumber", type: "number" },
+              { label: "Flat#", name: "flatNumber", type: "text" },
+              { label: "Rental Price", name: "rentalPrice", type: "text" },
+              {
+                label: "Prop-Desc",
+                name: "prop_desc",
+                type: "dropdown",
+                options: propDesc,
+              },
+              {
+                label: "Baths",
+                name: "nbaths",
+                type: "dropdown",
+                options: bathrooms,
+              },
+            ];
+            [
+              // { label: "Rental Price", name: "rentalPrice", type: "text" },
+              {
+                label: "Balconies",
+                name: "nbalcony",
+                type: "dropdown",
+                options: balcony,
+              },
+              {
+                label: "Parking",
+                name: "parking_count",
+                type: "dropdown",
+                options: parkingCount,
+              },
+              {
+                label: "Tenant-Type",
+                name: "tenant_type",
+                type: "dropdown",
+                options: tenant,
+              },
+              {
+                label: "Eat-Pref",
+                name: "eat_pref",
+                type: "dropdown",
+                options: tenantEat,
+              },
+              { label: "Upload Images", name: "images", type: "file" },
+            ];
+          }
+          setPanels(updatedPanels);
+          return updatedPanels;
+        });
+      }
     }
-  }
 
-  // Clear error for the specific field
-  setErrors((prev) => ({
-    ...prev,
-    [name]: "",
-  }));
-};
-
-
-
-  
-  
-  
+    // Clear error for the specific field
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+  };
 
   const handleRemoveImage = (index) => {
     setFormData((prev) => ({
@@ -709,7 +691,6 @@ const handleInputChange = (e) => {
     return panelErrors;
   };
 
-
   const handleNext = () => {
     const panelFields = panels[currentStep - 1];
     const panelErrors = validatePanel(panelFields);
@@ -723,7 +704,7 @@ const handleInputChange = (e) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const tableName = "dy_property";
     const fieldNames = [
       "user_id",
@@ -742,7 +723,7 @@ const handleInputChange = (e) => {
       "floor_no",
       "flat_no",
     ].join(",");
-  
+
     const fieldValues = [
       1, // Example user_id
       formData.prop_type_id || null,
@@ -760,16 +741,26 @@ const handleInputChange = (e) => {
       parseInt(formData.floor_no) || null,
       parseInt(formData.flat_no) || null,
     ];
-  
+
     // Format fieldValues for SQL
     const formattedFieldValues = fieldValues
-      .map((value) => (value === null || value === undefined ? "NULL" : `'${value}'`))
+      .map((value) =>
+        value === null || value === undefined ? "NULL" : `'${value}'`,
+      )
       .join(",");
-  
+
     try {
-      console.log("Submitting data:", { tableName, fieldNames, formattedFieldValues });
-  
-      const response = await addNewRecord(tableName, fieldNames, formattedFieldValues);
+      console.log("Submitting data:", {
+        tableName,
+        fieldNames,
+        formattedFieldValues,
+      });
+
+      const response = await addNewRecord(
+        tableName,
+        fieldNames,
+        formattedFieldValues,
+      );
       if (response.message === "Record added successfully") {
         alert("Property posted successfully!");
       } else {
@@ -780,13 +771,6 @@ const handleInputChange = (e) => {
       alert("An error occurred while posting the property.");
     }
   };
-  
-
-
-  
-  
-  
-  
 
   const renderInputs = (inputs) =>
     inputs.map((input, idx) => (
@@ -850,115 +834,104 @@ const handleInputChange = (e) => {
                   isLoading={isLoadingCommunity}
                   disabled={isLoadingCommunity || !formData.builder}
                   error={communityError}
-                 
                   helperText={
                     !formData.builder ? "Please select a builder first" : ""
                   }
                   displayKey="name"
                   valueKey="id"
                 />
-              ) : input.name === "prop_type_id" ? (
+              ) : input.name === "prop_type" ? (
                 <SearchableDropdown
-                 name={input.name}
-                 //options={Array.isArray(propType) ? propType : []}
-                 options={propType}
-                 value={formData[input.name]}
-                 onChange={handleInputChange}
-                              placeholder="Select Property Type"
-               displayKey="prop_type"
-               valueKey="id"
-/>          
-              ):input.name === "home_type_id" ?(
-              <SearchableDropdown
-              name={input.name}
-              options={Array.isArray(homeType) ? homeType : []} // Ensure this is the correct array, like homeType
-              value={formData[input.name]} // This should correctly reflect the selected value from formData
-              onChange={handleInputChange}
-              placeholder={`Select ${input.label}`}
-              displayKey="home_type"    // This should match the field inside each option (home_type)
-              valueKey="id"             // The unique key for each option
-            />
-
-              ) : input.name === "no_balconies" ?(
+                  name={input.name}
+                  options={Array.isArray(propType) ? propType : []}
+                  value={formData[input.name]}
+                  onChange={(selected) =>
+                    handleInputChange({
+                      target: {
+                        name: prop_type_id,
+                        value: selected?.id || null,
+                      },
+                    })
+                  }
+                  placeholder="Select Property Type"
+                  displayKey="prop_type"
+                  valueKey="id"
+                />
+              ) : input.name === "home_type" ? (
                 <SearchableDropdown
-                name={input.name}
-                options={Array.isArray(balcony) ? balcony : []} // Ensure this is the correct array, like homeType
-                value={formData[input.name]} // This should correctly reflect the selected value from formData
-                onChange={handleInputChange}
-                placeholder={`Select ${input.label}`}
-                displayKey="nbalcony"    // This should match the field inside each option (home_type)
-                valueKey="id"             // The unique key for each option
-              />
-  
-                ): input.name === "parking_count_id" ?(
-                  <SearchableDropdown
+                  name={input.name}
+                  options={Array.isArray(homeType) ? homeType : []} // Ensure this is the correct array, like homeType
+                  value={formData[input.name]} // This should correctly reflect the selected value from formData
+                  onChange={handleInputChange}
+                  placeholder={`Select ${input.label}`}
+                  displayKey="home_type" // This should match the field inside each option (home_type)
+                  valueKey="id" // The unique key for each option
+                />
+              ) : input.name === "nbalcony" ? (
+                <SearchableDropdown
+                  name={input.name}
+                  options={Array.isArray(balcony) ? balcony : []} // Ensure this is the correct array, like homeType
+                  value={formData[input.name]} // This should correctly reflect the selected value from formData
+                  onChange={handleInputChange}
+                  placeholder={`Select ${input.label}`}
+                  displayKey="nbalcony" // This should match the field inside each option (home_type)
+                  valueKey="id" // The unique key for each option
+                />
+              ) : input.name === "parking_count" ? (
+                <SearchableDropdown
                   name={input.name}
                   options={Array.isArray(parkingCount) ? parkingCount : []} // Ensure this is the correct array, like homeType
                   value={formData[input.name]} // This should correctly reflect the selected value from formData
                   onChange={handleInputChange}
                   placeholder={`Select ${input.label}`}
-                  displayKey="parking_count"    // This should match the field inside each option (home_type)
-                  valueKey="id"             // The unique key for each option
+                  displayKey="parking_count" // This should match the field inside each option (home_type)
+                  valueKey="id" // The unique key for each option
                 />
-    
-                  ): input.name === "tenant_type_id" ?(
-                    <SearchableDropdown
-                    name={input.name}
-                    options={Array.isArray(tenant) ? tenant : []} // Ensure this is the correct array, like homeType
-                    value={formData[input.name]} // This should correctly reflect the selected value from formData
-                    onChange={handleInputChange}
-                    placeholder={`Select ${input.label}`}
-                    displayKey="tenant_type"    // This should match the field inside each option (home_type)
-                    valueKey="id"             // The unique key for each option
-                  />
-      
-                    ): input.name === "tenant_eat_pref_id" ?(
-                      <SearchableDropdown
-                      name={input.name}
-                      options={Array.isArray(tenantEat) ?  tenantEat: []} // Ensure this is the correct array, like homeType
-                      value={formData[input.name]} // This should correctly reflect the selected value from formData
-                      onChange={handleInputChange}
-                      placeholder={`Select ${input.label}`}
-                      displayKey="eat_pref"    // This should match the field inside each option (home_type)
-                      valueKey="id"             // The unique key for each option
-                    />
-        
-                      ):input.name === "prop_desc_id" ?(
-                        <SearchableDropdown
-                        name={input.name}
-                        options={propDesc} // Ensure this is the correct array, like homeType
-                        value={formData[input.name]} // This should correctly reflect the selected value from formData
-                        onChange={handleInputChange}
-                        placeholder={`Select ${input.label}`}
-                        displayKey="prop_desc"    // This should match the field inside each option (home_type)
-                        valueKey="id"             // The unique key for each option
-                      />
-          
-                        ):input.name === "parking_count_id" ?(
-                          <SearchableDropdown
-                          name={input.name}
-                          options={parkingCount} // Ensure this is the correct array, like homeType
-                          value={formData[input.name]} // This should correctly reflect the selected value from formData
-                          onChange={handleInputChange}
-                          placeholder={`Select ${input.label}`}
-                          displayKey="parking_count"    // This should match the field inside each option (home_type)
-                          valueKey="id"             // The unique key for each option
-                        />
-            
-                          ):input.name === "no_baths" &&(
-                          <SearchableDropdown
-                          name={input.name}
-                          options={bathrooms} // Ensure this is the correct array, like homeType
-                          value={formData[input.name]} // This should correctly reflect the selected value from formData
-                          onChange={handleInputChange}
-                          placeholder={`Select ${input.label}`}
-                          displayKey="nbaths"    // This should match the field inside each option (home_type)
-                          valueKey="id"             // The unique key for each option
-                        />
-            
-                          )
-                        }
-                        
+              ) : input.name === "tenant_type" ? (
+                <SearchableDropdown
+                  name={input.name}
+                  options={Array.isArray(tenant) ? tenant : []} // Ensure this is the correct array, like homeType
+                  value={formData[input.name]} // This should correctly reflect the selected value from formData
+                  onChange={handleInputChange}
+                  placeholder={`Select ${input.label}`}
+                  displayKey="tenant_type" // This should match the field inside each option (home_type)
+                  valueKey="id" // The unique key for each option
+                />
+              ) : input.name === "eat_pref" ? (
+                <SearchableDropdown
+                  name={input.name}
+                  options={Array.isArray(tenantEat) ? tenantEat : []} // Ensure this is the correct array, like homeType
+                  value={formData[input.name]} // This should correctly reflect the selected value from formData
+                  onChange={handleInputChange}
+                  placeholder={`Select ${input.label}`}
+                  displayKey="eat_pref" // This should match the field inside each option (home_type)
+                  valueKey="id" // The unique key for each option
+                />
+              ) : (
+                <SearchableDropdown
+                  name={input.name}
+                  options={input.options}
+                  value={formData[input.name]}
+                  onChange={handleInputChange}
+                  placeholder={`Select ${input.label}`}
+                  displayKey={
+                    // input.name === "home_type"
+                    //   ? "home_type"
+                    input.name === "nbaths"
+                      ? "nbaths"
+                      : input.name === "prop_desc"
+                        ? "prop_desc"
+                        : //: input.name === "balcony"
+                          //? "nbalcony"
+                          input.name === "tenant_type"
+                          ? "tenant_type"
+                          : input.name === "eat_pref"
+                            ? "eat_pref"
+                            : input.name === "parking_count" && "parking_count"
+                  }
+                  valueKey="id"
+                />
+              )}
             </div>
           ) : input.type === "file" ? (
             <>

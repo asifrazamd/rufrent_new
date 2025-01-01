@@ -1,5 +1,22 @@
 /* eslint-disable react/prop-types */
-// import React, { useState, useRef, useEffect } from "react";
+// /**
+//  * SearchableDropdown Component
+//  * A customizable dropdown with search functionality.
+//  *
+//  * @param {Object[]} options - List of dropdown options.
+//  * @param {string|number} value - Selected option value.
+//  * @param {function} onChange - Callback when the selected value changes.
+//  * @param {string} placeholder - Placeholder text for the input.
+//  * @param {boolean} isLoading - Whether the dropdown is loading options.
+//  * @param {boolean} disabled - Whether the dropdown is disabled.
+//  * @param {string} error - Error message to display.
+//  * @param {string} helperText - Helper text to display.
+//  * @param {string} displayKey - Key in options object for display text.
+//  * @param {string} valueKey - Key in options object for value.
+//  * @param {string} name - Name attribute for the input field.
+//  */
+
+// import React, { useState, useEffect, useRef } from "react";
 
 // const SearchableDropdown = ({
 //   options,
@@ -11,42 +28,48 @@
 //   error,
 //   helperText,
 //   displayKey,
-//   valueKey = "id",
+//   valueKey,
 //   name,
 // }) => {
+//   // State to control dropdown visibility
 //   const [isOpen, setIsOpen] = useState(false);
+//   // State to track the current search term
 //   const [searchTerm, setSearchTerm] = useState("");
+//   // State to determine if input has been interacted with
 //   const [touched, setTouched] = useState(false);
+//   // State to track the currently highlighted option index
 //   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+//   // Reference to the dropdown container
 //   const dropdownRef = useRef(null);
+//   // Reference to the input field
 //   const inputRef = useRef(null);
 
+//   // Identify the selected option based on the value
 //   const selectedOption = options.find(
 //     (opt) => opt[valueKey]?.toString() === value?.toString()
 //   );
 
+//   // Update the search term based on the selected option when not touched
 //   useEffect(() => {
 //     if (selectedOption && !touched) {
 //       setSearchTerm(selectedOption[displayKey] || "");
 //     }
 //   }, [selectedOption, displayKey, touched]);
 
+//   // Filter options based on the search term
 //   const filteredOptions = searchTerm
 //     ? options.filter((option) =>
 //         option[displayKey].toLowerCase().includes(searchTerm.toLowerCase())
 //       )
 //     : options;
 
+//   // Close the dropdown when clicking outside of it
 //   useEffect(() => {
 //     const handleClickOutside = (event) => {
 //       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
 //         setIsOpen(false);
 //         setTouched(false);
-//         if (selectedOption) {
-//           setSearchTerm(selectedOption[displayKey] || "");
-//         } else {
-//           setSearchTerm("");
-//         }
+//         setSearchTerm(selectedOption ? selectedOption[displayKey] : "");
 //         setHighlightedIndex(-1);
 //       }
 //     };
@@ -55,14 +78,15 @@
 //     return () => document.removeEventListener("mousedown", handleClickOutside);
 //   }, [selectedOption, displayKey]);
 
+//   // Handle input field changes
 //   const handleInputChange = (e) => {
-//     const newSearchTerm = e.target.value;
-//     setSearchTerm(newSearchTerm);
+//     setSearchTerm(e.target.value);
 //     setTouched(true);
 //     setIsOpen(true);
 //     setHighlightedIndex(-1);
 //   };
 
+//   // Handle option click events
 //   const handleOptionClick = (option) => {
 //     setTouched(false);
 //     setSearchTerm(option[displayKey]);
@@ -71,6 +95,7 @@
 //     onChange({ target: { name, value: option[valueKey] } });
 //   };
 
+//   // Handle keyboard navigation within the dropdown
 //   const handleKeyDown = (e) => {
 //     if (!isOpen) {
 //       if (e.key === "ArrowDown" || e.key === "Enter") {
@@ -83,47 +108,43 @@
 
 //     switch (e.key) {
 //       case "ArrowDown":
+//         setHighlightedIndex((prev) =>
+//           prev + 1 >= filteredOptions.length ? 0 : prev + 1
+//         );
 //         e.preventDefault();
-//         setHighlightedIndex((prevIndex) => {
-//           const nextIndex = prevIndex + 1;
-//           return nextIndex >= filteredOptions.length ? 0 : nextIndex;
-//         });
 //         break;
-
 //       case "ArrowUp":
+//         setHighlightedIndex((prev) =>
+//           prev - 1 < 0 ? filteredOptions.length - 1 : prev - 1
+//         );
 //         e.preventDefault();
-//         setHighlightedIndex((prevIndex) => {
-//           const nextIndex = prevIndex - 1;
-//           return nextIndex < 0 ? filteredOptions.length - 1 : nextIndex;
-//         });
 //         break;
-
 //       case "Enter":
-//         e.preventDefault();
 //         if (
 //           highlightedIndex >= 0 &&
 //           highlightedIndex < filteredOptions.length
 //         ) {
 //           handleOptionClick(filteredOptions[highlightedIndex]);
 //         }
+//         e.preventDefault();
 //         break;
-
 //       case "Escape":
 //         setIsOpen(false);
 //         setHighlightedIndex(-1);
 //         inputRef.current?.blur();
 //         break;
-
 //       default:
 //         break;
 //     }
 //   };
 
+//   // Open dropdown and set touched state on input focus
 //   const handleFocus = () => {
 //     setIsOpen(true);
 //     setTouched(true);
 //   };
 
+//   // Clear the search term and reset the state
 //   const handleClear = (e) => {
 //     e.stopPropagation();
 //     setSearchTerm("");
@@ -133,7 +154,7 @@
 //     setHighlightedIndex(-1);
 //   };
 
-//   // Scroll highlighted option into view
+//   // Ensure the highlighted option is visible in the dropdown
 //   useEffect(() => {
 //     if (isOpen && highlightedIndex >= 0) {
 //       const optionElement = document.getElementById(
@@ -147,6 +168,7 @@
 
 //   return (
 //     <div className="relative" ref={dropdownRef}>
+//       {/* Input field */}
 //       <div className="relative">
 //         <input
 //           ref={inputRef}
@@ -172,14 +194,16 @@
 //         )}
 //       </div>
 
+//       {/* Loading spinner */}
 //       {isLoading && (
 //         <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
 //           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
 //         </div>
 //       )}
 
+//       {/* Dropdown options */}
 //       {isOpen && !disabled && (
-//         <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+//         <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-40 overflow-auto">
 //           {filteredOptions.length > 0 ? (
 //             filteredOptions.map((option, index) => (
 //               <div
@@ -205,6 +229,7 @@
 //         </div>
 //       )}
 
+//       {/* Error and helper text */}
 //       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
 //       {helperText && <p className="text-gray-500 text-sm mt-1">{helperText}</p>}
 //     </div>
@@ -212,26 +237,9 @@
 // };
 
 // export default SearchableDropdown;
-import React, { useState, useRef, useEffect } from "react";
 
-/**
- * SearchableDropdown Component
- *
- * A customizable dropdown component with search functionality and keyboard navigation.
- *
- * Props:
- * - options: Array of options to display in the dropdown
- * - value: Currently selected value
- * - onChange: Callback triggered when the selected value changes
- * - placeholder: Placeholder text for the input field
- * - isLoading: Boolean to show a loading spinner
- * - disabled: Boolean to disable the input field
- * - error: Error message to display below the dropdown
- * - helperText: Helper text to display below the dropdown
- * - displayKey: Key to use for displaying option labels
- * - valueKey: Key to use for identifying option values (default is "id")
- * - name: Name attribute for the input field (used in the onChange callback)
- */
+import React, { useState, useEffect, useRef } from "react";
+
 const SearchableDropdown = ({
   options,
   value,
@@ -245,24 +253,26 @@ const SearchableDropdown = ({
   valueKey,
   name,
 }) => {
-  const [isOpen, setIsOpen] = useState(false); // Controls dropdown visibility
-  const [searchTerm, setSearchTerm] = useState(""); // Current search term
-  const [touched, setTouched] = useState(false); // Tracks if the input has been interacted with
-  const [highlightedIndex, setHighlightedIndex] = useState(-1); // Index of the currently highlighted option
-  const dropdownRef = useRef(null); // Ref for dropdown container
-  const inputRef = useRef(null); // Ref for input field
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [touched, setTouched] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const dropdownRef = useRef(null);
+  const inputRef = useRef(null);
 
-  // Find the currently selected option
+  // Identify the selected option based on the value
   const selectedOption = options.find(
     (opt) => opt[valueKey]?.toString() === value?.toString()
   );
 
-  // Set the search term based on the selected option
+  // Reset searchTerm when value changes
   useEffect(() => {
-    if (selectedOption && !touched) {
+    if (selectedOption) {
       setSearchTerm(selectedOption[displayKey] || "");
+    } else {
+      setSearchTerm(""); // Reset searchTerm if no selected option
     }
-  }, [selectedOption, displayKey, touched]);
+  }, [selectedOption, displayKey, value]); // Add value to dependencies
 
   // Filter options based on the search term
   const filteredOptions = searchTerm
@@ -277,16 +287,15 @@ const SearchableDropdown = ({
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
         setTouched(false);
-        setSearchTerm(selectedOption ? selectedOption[displayKey] : "");
         setHighlightedIndex(-1);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [selectedOption, displayKey]);
+  }, []);
 
-  // Handle changes to the input field
+  // Handle input field changes
   const handleInputChange = (e) => {
     setSearchTerm(e.target.value);
     setTouched(true);
@@ -294,7 +303,7 @@ const SearchableDropdown = ({
     setHighlightedIndex(-1);
   };
 
-  // Handle clicking on an option
+  // Handle option click events
   const handleOptionClick = (option) => {
     setTouched(false);
     setSearchTerm(option[displayKey]);
@@ -303,7 +312,7 @@ const SearchableDropdown = ({
     onChange({ target: { name, value: option[valueKey] } });
   };
 
-  // Handle keyboard navigation
+  // Handle keyboard navigation within the dropdown
   const handleKeyDown = (e) => {
     if (!isOpen) {
       if (e.key === "ArrowDown" || e.key === "Enter") {
@@ -346,13 +355,13 @@ const SearchableDropdown = ({
     }
   };
 
-  // Handle input focus
+  // Open dropdown and set touched state on input focus
   const handleFocus = () => {
     setIsOpen(true);
     setTouched(true);
   };
 
-  // Clear the search term
+  // Clear the search term and reset the state
   const handleClear = (e) => {
     e.stopPropagation();
     setSearchTerm("");
@@ -362,7 +371,7 @@ const SearchableDropdown = ({
     setHighlightedIndex(-1);
   };
 
-  // Scroll the highlighted option into view
+  // Ensure the highlighted option is visible in the dropdown
   useEffect(() => {
     if (isOpen && highlightedIndex >= 0) {
       const optionElement = document.getElementById(
@@ -376,7 +385,6 @@ const SearchableDropdown = ({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Input field */}
       <div className="relative">
         <input
           ref={inputRef}
@@ -402,14 +410,12 @@ const SearchableDropdown = ({
         )}
       </div>
 
-      {/* Loading spinner */}
       {isLoading && (
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
         </div>
       )}
 
-      {/* Dropdown options */}
       {isOpen && !disabled && (
         <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-40 overflow-auto">
           {filteredOptions.length > 0 ? (
@@ -437,7 +443,6 @@ const SearchableDropdown = ({
         </div>
       )}
 
-      {/* Error and helper text */}
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       {helperText && <p className="text-gray-500 text-sm mt-1">{helperText}</p>}
     </div>
