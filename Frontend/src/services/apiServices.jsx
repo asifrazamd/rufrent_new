@@ -71,6 +71,7 @@ export const uploadProperty = async (fieldValues) => {
           "tenant_type_id",
           "tenant_eat_pref_id",
           "rental_low",
+          "rental_high",
           
           "parking_count_id",
           "maintenance_id",

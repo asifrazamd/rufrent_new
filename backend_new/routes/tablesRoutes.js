@@ -6,12 +6,13 @@
 const express = require('express');
 const router = express.Router();
 const { 
-    addRmTask,
+    addRequest,
     showPropDetails,
     getTasks,
     getFmList,
     updateTask, 
-    userActions,filterProperties
+    userActions,
+    getTopCommunities
 } = require('../controllers/tablesController');
 const { addNewRecord } = require('../utils/addNewRecord');
 const { getRecords } = require('../utils/getRecords');
@@ -44,7 +45,7 @@ router.post('/addNewRecord', addNewRecord);
  * - Success: JSON object with details of the created request.
  * - Error: JSON object with an error message.
  */
-router.post('/addRmTask', addRmTask);
+router.post('/addRequest', addRequest);
 
 /**
  * GET /api/tables/getAllProperties
@@ -56,7 +57,6 @@ router.post('/addRmTask', addRmTask);
  */
 router.get('/showPropDetails', showPropDetails);
 
-router.get('/filter',filterProperties);
 
 /**
  * GET /api/tables/requests
@@ -146,4 +146,7 @@ router.delete('/deleteRecords', deleteRecords);
 /**
  * Export the router to be used in other parts of the application.
  */
+
+
+router.get('/getTopCommunities',getTopCommunities)
 module.exports = router;

@@ -1,9 +1,13 @@
 const db = require("../config/db"); // Database db
 //const { redis } = require("../config/redis");
 const { updateRecords } = require("../utils/updateRecords"); // Adjust the path as needed
-const { getRecords } = require("../utils/getRecords"); // Adjust the path as needed
 
-const addRmTask = async (req, res) => {
+const { getJoinedData } = require("../utils/getJoinedData");
+const { getRecords } = require("../utils/getRecords"); // Import the getRecords function
+
+const { propertyFields } = require("../utils/propertyFields");
+
+const addRequest = async (req, res) => {
   // Extract user_id and property_id from the request body
   const { user_id, property_id } = req.body;
 
@@ -57,31 +61,23 @@ const addRmTask = async (req, res) => {
  */
 const showPropDetails = async (req, res) => {
   try {
-    const { property_id,city, builders, community, hometype, propertydescription, page = 1, limit = 6 } = req.query;
-    console.log("re",req.query)
+    const {
+      property_id,
+      city,
+      builders,
+      community,
+      hometype,
+      propertydescription,
+      page = 1,
+      limit = 6,
+    } = req.query;
 
     const sanitizedPage = Math.max(1, parseInt(page, 10));
     const sanitizedLimit = Math.max(1, parseInt(limit, 10));
     const offset = (sanitizedPage - 1) * sanitizedLimit;
 
     const tableName = "dy_property dy";
-    const joinClauses = `
-LEFT JOIN st_prop_type spt ON dy.prop_type_id = spt.id
-      LEFT JOIN st_home_type sht ON dy.home_type_id = sht.id
-      LEFT JOIN st_prop_desc spd ON dy.prop_desc_id = spd.id
-
-      LEFT JOIN st_community sc ON dy.community_id = sc.id
-      LEFT JOIN st_builder sb ON sc.builder_id = sb.id
-      LEFT JOIN st_city scity ON sb.city_id = scity.id  -- Join to get city name
-
-      LEFT JOIN st_beds snbe ON dy.no_beds = snbe.id
-      LEFT JOIN st_baths snba ON dy.no_baths = snba.id
-      LEFT JOIN st_balcony snbc ON dy.no_balconies = snbc.id
-      LEFT JOIN st_tenant_eat_pref step ON dy.tenant_eat_pref_id = step.id
-      LEFT JOIN st_parking_count spc ON dy.parking_count_id = spc.id
-      LEFT JOIN st_deposit_range sdr ON dy.deposit_range_id = sdr.id
-      LEFT JOIN st_maintenance sm ON dy.maintenance_id = sm.id
-        `;
+    const joinClauses = propertyFields();
 
     const fieldNames = `
       dy.id,
@@ -119,49 +115,63 @@ LEFT JOIN st_prop_type spt ON dy.prop_type_id = spt.id
 
     const whereClauses = [];
 
-// Add conditions based on provided filters
-if (property_id) whereClauses.push(`dy.id = ${db.escape(property_id)}`);
+    // Add conditions based on provided filters
+    if (property_id) whereClauses.push(`dy.id = ${db.escape(property_id)}`);
+    if (city) {
+      const cityArray = city.split(",").map((c) => c.trim());
+      const escapedCities = cityArray.map((c) => db.escape(c)).join(", ");
+      whereClauses.push(`scity.id IN (${escapedCities})`);
+    }
+    if (builders) {
+      const buildersArray = builders
+        .split(",")
+        .map((builder) => builder.trim());
+      const escapedBuilders = buildersArray
+        .map((builder) => db.escape(builder))
+        .join(", ");
+      whereClauses.push(`sb.id IN (${escapedBuilders})`);
+    }
+    if (community) {
+      const communityArray = community.split(",").map((com) => com.trim());
+      const escapedCommunities = communityArray
+        .map((com) => db.escape(com))
+        .join(", ");
+      whereClauses.push(`sc.id IN (${escapedCommunities})`);
+    }
+    if (hometype) {
+      const hometypeArray = hometype.split(",").map((type) => type.trim());
+      const escapedHometypes = hometypeArray
+        .map((type) => db.escape(type))
+        .join(", ");
+      whereClauses.push(`dy.home_type_id IN (${escapedHometypes})`);
+    }
+    if (propertydescription) {
+      const propertyDescArray = propertydescription
+        .split(",")
+        .map((desc) => desc.trim());
+      const escapedPropertyDescs = propertyDescArray
+        .map((desc) => db.escape(desc))
+        .join(", ");
+      whereClauses.push(`dy.prop_desc_id IN (${escapedPropertyDescs})`);
+    }
 
-if (city) {
-  const cityArray = city.split(",").map((c) => c.trim());
-  const escapedCities = cityArray.map((c) => db.escape(c)).join(", ");
-  whereClauses.push(`scity.id IN (${escapedCities})`);
-}
-if (builders) {
-  const buildersArray = builders.split(",").map((builder) => builder.trim());
-  const escapedBuilders = buildersArray.map((builder) => db.escape(builder)).join(", ");
-  whereClauses.push(`sb.id IN (${escapedBuilders})`);
-}
-if (community) {
-  const communityArray = community.split(",").map((com) => com.trim());
-  const escapedCommunities = communityArray.map((com) => db.escape(com)).join(", ");
-  whereClauses.push(`sc.id IN (${escapedCommunities})`);
-}
-if (hometype) {
-  const hometypeArray = hometype.split(",").map((type) => type.trim());
-  const escapedHometypes = hometypeArray.map((type) => db.escape(type)).join(", ");
-  whereClauses.push(`dy.home_type_id IN (${escapedHometypes})`);
-}
-if (propertydescription) {
-  const propertyDescArray = propertydescription.split(",").map((desc) => desc.trim());
-  const escapedPropertyDescs = propertyDescArray.map((desc) => db.escape(desc)).join(", ");
-  whereClauses.push(`dy.prop_desc_id IN (${escapedPropertyDescs})`);
-}
+    // Construct WHERE condition based on the clauses
+    const whereCondition =
+      whereClauses.length > 0 ? whereClauses.join(" AND ") : "1"; // Default to no filter if no conditions
 
-// Construct WHERE condition based on the clauses
-const whereCondition = whereClauses.length > 0 ? whereClauses.join(' AND ') : '1'; // Default to no filter if no conditions
-console.log("cee",whereCondition)
+    query = {
+      tableName: tableName,
+      joinClauses: joinClauses,
+      fieldNames: fieldNames,
+      whereCondition: whereCondition,
+    };
 
+    const [results] = await getJoinedData((req = { query }), res, {
+      resultOnly: true,
+    });
 
-    const [results] = await db.execute(`CALL getJoinedData(?, ?, ?, ?);`, [
-      tableName,
-      joinClauses,
-      fieldNames,
-      whereCondition,
-    ]);
-
-    const paginatedResults = results[0].slice(offset, offset + sanitizedLimit);
-    const totalRecords = results[0].length;
+    const paginatedResults = results.slice(offset, offset + sanitizedLimit);
+    const totalRecords = results.length;
     const totalPages = Math.ceil(totalRecords / sanitizedLimit);
 
     if (paginatedResults.length === 0) {
@@ -206,111 +216,10 @@ console.log("cee",whereCondition)
   }
 };
 
-const filterProperties = async (req, res) => {
-  try {
-    // Extract filters from query parameters
-    const { city, builders, community, hometype, propertydescription} = req.query;
-
-    // Define table name, join clauses, and fields
-    const tableName = 'dy_property dy';
-    const joinClauses = `
-      LEFT JOIN st_prop_type spt ON dy.prop_type_id = spt.id
-      LEFT JOIN st_home_type sht ON dy.home_type_id = sht.id
-      LEFT JOIN st_prop_desc spd ON dy.prop_desc_id = spd.id
-
-      LEFT JOIN st_community sc ON dy.community_id = sc.id
-      LEFT JOIN st_builder sb ON sc.builder_id = sb.id
-      LEFT JOIN st_city scity ON sb.city_id = scity.id  -- Join to get city name
-
-      LEFT JOIN st_beds snbe ON dy.no_beds = snbe.id
-      LEFT JOIN st_baths snba ON dy.no_baths = snba.id
-      LEFT JOIN st_balcony snbc ON dy.no_balconies = snbc.id
-      LEFT JOIN st_tenant_eat_pref step ON dy.tenant_eat_pref_id = step.id
-      LEFT JOIN st_parking_count spc ON dy.parking_count_id = spc.id
-      LEFT JOIN st_deposit_range sdr ON dy.deposit_range_id = sdr.id
-      LEFT JOIN st_maintenance sm ON dy.maintenance_id = sm.id
-    `;
-    const fieldNames = `
-      dy.id,
-
-      spt.prop_type AS prop_type,
-      sht.home_type AS home_type,
-      spd.prop_desc AS prop_desc,
-      sc.name AS community_name,
-      sc.map_url AS map_url,
-      sc.total_area AS total_area,
-      sc.open_area AS open_area,
-      sc.nblocks AS nblocks,
-      sc.nfloors_per_block AS nfloors_per_block,
-      sc.nhouses_per_floor AS nhouses_per_floor,
-      sc.address AS address,
-      sc.totflats AS totflats,
-      snbe.nbeds AS nbeds,
-      snba.nbaths AS nbaths,
-      snbc.nbalcony AS nbalcony,
-      step.eat_pref AS eat_pref,
-      spc.parking_count AS parking_count,
-      sdr.nmonths AS deposit,
-      sm.maintenance_type AS maintenance_type,
-
-      dy.rental_low,
-      dy.rental_high,
-      dy.tower_no,
-      dy.floor_no,
-      dy.flat_no,
-      dy.images_location,
-      sb.name AS builder_name,
-      scity.name AS city_name  -- Fetch the city name
-    `;
-
-    // Construct WHERE clause for filters
-    const whereClauses = [];
-    if (city) whereClauses.push(`scity.name LIKE ${db.escape('%' + city + '%')}`);  // City filter added
-
-    if (builders) whereClauses.push(`sb.id = ${db.escape(builders)}`);
-    if (community) whereClauses.push(`sc.name LIKE ${db.escape('%' + community + '%')}`);
-    if (hometype) whereClauses.push(`dy.home_type_id = ${db.escape(hometype)}`);
-    if (propertydescription)
-      whereClauses.push(`dy.prop_desc_id = ${db.escape(propertydescription)}`);
-
-    const whereCondition = whereClauses.length > 0 ? whereClauses.join(' AND ') : '1'; // Default to no filter
-
-
-    // Call the stored procedure
-    const [results] = await db.execute(
-      `CALL getJoinedData(?, ?, ?, ?)`,
-      [tableName, joinClauses, fieldNames, whereCondition]
-    );
-
-    // Check if results are found and return the response
-    if (!results || results[0].length === 0) {
-      return res.status(404).json({ error: 'No properties found for the given filters.' });
-    }
-
-    res.status(200).json({
-      message: `Filtered property details by provided filters.`,
-      results: results[0], // Ensure you return the first result (the data)
-    });
-  } catch (err) {
-    console.error('Error executing query:', err);
-    res.status(500).json({
-      error: 'Database error occurred while executing the query.',
-      details: err.message,
-    });
-  }
-};
-
-
-
-
-
-
-
-
 const userActions = async (req, res) => {
   try {
     // Extract query parameters for filtering
-    const { id } = req.query;
+    const { user_id, property_id, id } = req.query;
 
     // Define the table name and the join clauses for the query
     const tableName = "dy_user_actions ua";
@@ -348,52 +257,39 @@ LEFT JOIN
     // Define the fields to be retrieved in the query
     const fieldNames = `
           ua.id AS action_id,
-    u.id AS user_id,
-    u.user_name,
-    u.email_id,
-    u.mobile_no,
     scd.status_code AS status_description,
     dy.id AS property_id,
     spt.prop_type AS prop_type,
     sht.home_type AS home_type,
     spd.prop_desc AS prop_desc,
     sc.name AS community_name,
-    sc.map_url AS map_url,
-    sc.total_area AS total_area,
-    sc.open_area AS open_area,
-    sc.nblocks AS nblocks,
-    sc.nfloors_per_block AS nfloors_per_block,
-    sc.nhouses_per_floor AS nhouses_per_floor,
     sc.address AS address,
-    sc.totflats AS totflats,
-    snbe.nbeds AS nbeds,
-    snba.nbaths AS nbaths,
-    snbc.nbalcony AS nbalcony,
-    step.eat_pref AS eat_pref,
-    spc.parking_count AS parking_count,
-    sdr.nmonths AS deposit,
-    sm.maintenance_type AS maintenance_type,
-    dy.rental_low,
-    dy.rental_high,
-    dy.tower_no,
-    dy.floor_no,
-    dy.flat_no,
     dy.images_location
     `;
 
-    // Construct WHERE clause dynamically based on the presence of property_id
-    const whereCondition = id ? `ua.status_code = ${db.escape(id)}` : "";
+    // Construct WHERE clause dynamically based on the presence of query parameters
+    const conditions = [];
+    if (id) conditions.push(`ua.status_code = ${db.escape(id)}`);
+    if (user_id) conditions.push(`ua.user_id = ${db.escape(user_id)}`);
+    if (property_id)
+      conditions.push(`ua.property_id = ${db.escape(property_id)}`);
 
-    // Call the stored procedure with the dynamically constructed query parameters
-    const [results] = await db.execute(`CALL getJoinedData(?, ?, ?, ?);`, [
-      tableName,
-      joinClauses,
-      fieldNames,
-      whereCondition,
-    ]);
+    const whereCondition =
+      conditions.length > 0 ? conditions.join(" AND ") : "";
+
+    query = {
+      tableName: tableName,
+      joinClauses: joinClauses,
+      fieldNames: fieldNames,
+      whereCondition: whereCondition,
+    };
+
+    const results = await getJoinedData((req = { query }), res, {
+      resultOnly: true,
+    });
 
     // Return 404 if no records are found
-    if (results[0].length === 0) {
+    if (results.length === 0) {
       return res.status(404).json({
         error: "No user actions found",
       });
@@ -401,8 +297,9 @@ LEFT JOIN
 
     // Return the results
     res.status(200).json({
-      message: id ? `Details for actions ID: ${id}` : `All actions details`,
-      results: results[0],
+      message: `User actions retrieved successfully.`,
+      //filters: { id, user_id, property_id },
+      results: results,
     });
   } catch (err) {
     // Log and return error details in case of failure
@@ -429,16 +326,17 @@ const getTasks = async (req, res) => {
       .json({ error: "Either rm_id or fm_id is required." });
   }
 
+  // Ensure the provided ID is a valid number
+  const idValue = rm_id || fm_id;
+  const idColumn = rm_id ? "rm_id" : "fm_id";
+
+  if (isNaN(idValue)) {
+    return res
+      .status(400)
+      .json({ error: `Invalid ${idColumn}. Must be a number.` });
+  }
+
   try {
-    // Determine the column and value for the WHERE clause dynamically
-    const idColumn = rm_id ? "rm_id" : "fm_id";
-    const idValue = rm_id || fm_id;
-
-    // Ensure the provided ID is a valid number
-    if (isNaN(idValue)) {
-      return res.status(400).json({ error: `Invalid ${idColumn}.` });
-    }
-
     // Define the table name, join clauses, and fields for the query
     const tableName = "dy_transactions dt";
     const joinClauses = `
@@ -461,19 +359,19 @@ const getTasks = async (req, res) => {
       dt.schedule_date AS schedule_date,
       dt.schedule_time AS schedule_time
     `;
+    const whereCondition = `${idColumn} = ${db.escape(idValue)}`;
 
-    // Dynamically construct the WHERE clause based on rm_id or fm_id
-    const whereCondition = rm_id
-      ? `dt.rm_id = ${db.escape(rm_id)}`
-      : `dt.fm_id = ${db.escape(fm_id)}`;
+    query = {
+      tableName: tableName,
+      joinClauses: joinClauses,
+      fieldNames: fieldNames,
+      whereCondition: whereCondition,
+    };
 
-    // Call the stored procedure to fetch joined data
-    const [results] = await db.execute(`CALL getJoinedData(?, ?, ?, ?);`, [
-      tableName,
-      joinClauses,
-      fieldNames,
-      whereCondition,
-    ]);
+
+    const results = await getJoinedData((req = { query }), res, {
+      resultOnly: true,
+    });
 
     // If no records are found, return a 404 error
     if (!results || results.length === 0) {
@@ -487,33 +385,36 @@ const getTasks = async (req, res) => {
       ? 'status_category="RMA" OR status_category="FMA"'
       : 'status_category="FMA"';
 
-    // Fetch statuses matching the condition
-    const [status] = await db.query(`CALL getRecordsByFields(?, ?, ?);`, [
-      "st_current_status",
-      "id,status_code",
-      statusCondition,
-    ]);
-    // req.query={
-    //   tbl_name:"st_current_status",
-    //   field_names:"id,status_code",
-    //   where_condition:statusCondition
-    // }
-    // await getRecords(req,res);
+    query = {
+      tbl_name: `st_current_status`,
+      field_names: `id,status_code`,
+      where_condition: statusCondition,
+    };
+    // Use `getRecords` to fetch statuses matching the condition
+    const statusData = await getRecords((req = { query }), res, {
+      resultOnly: true,
+    });
+
+    //const statusData= await db.query('st_current_status',)
 
     // Return the retrieved data and statuses
     res.status(200).json({
-      message: "Retrieved successfully.",
+      message: "Data retrieved successfully.",
       result: results[0],
-      status: status[0],
+      status: statusData,
     });
   } catch (error) {
-    // Log and handle errors
-    console.error("Error retrieving data:", error.message);
-    res
-      .status(500)
-      .json({
-        error: "An error occurred while retrieving the transaction data.",
-      });
+    // Log detailed error information for troubleshooting
+    console.error("Error in getAllTransactionBasedOnId:", error);
+
+    // Return a generic error message to the client
+    res.status(500).json({
+      error: "An error occurred while retrieving the transaction data.",
+      details:
+        process.env.NODE_ENV === "production"
+          ? "Internal Server Error"
+          : error.message,
+    });
   }
 };
 
@@ -537,13 +438,18 @@ const getFmList = async (req, res) => {
       ? `r.community_id = ${db.escape(community_id)}` // Escape the input to prevent SQL injection
       : "";
 
-    // Call the stored procedure to execute the query
-    const [results] = await db.execute(`CALL getJoinedData(?, ?, ?, ?);`, [
-      tableName,
-      joinClauses,
-      fieldNames,
-      whereCondition,
-    ]);
+    
+    query = {
+      tableName: tableName,
+      joinClauses: joinClauses,
+      fieldNames: fieldNames,
+      whereCondition: whereCondition,
+    };
+
+    const results = await getJoinedData((req = { query }), res, {
+      resultOnly: true,
+    });
+    
 
     // Check if no records are found
     if (!results || results.length === 0) {
@@ -555,7 +461,7 @@ const getFmList = async (req, res) => {
     // Return the results
     res.status(200).json({
       message: "Retrieved successfully.",
-      result: results[0], // Results are usually nested in the first index
+      result: results, // Results are usually nested in the first index
     });
   } catch (error) {
     // Log the error for debugging
@@ -577,51 +483,71 @@ const getFmList = async (req, res) => {
  * @param {Object} req - Express request object containing transaction details in `req.body`.
  * @param {Object} res - Express response object used to send the response.
  */
+
 const updateTask = async (req, res) => {
   const { id, cur_stat_code, schedule_time, schedule_date, fm_id } = req.body;
-  console.log("req",req.body);
+  let re;
 
   // Get a database connection
   const connection = await db.getConnection();
 
   try {
     // Fetch the current value of `cur_stat_code` for the transaction
-    const [currentStatus] = await connection.query(
-      "SELECT cur_stat_code FROM dy_transactions WHERE id = ?",
-      [id]
-    );
+   
+    query = {
+      tbl_name: `dy_transactions`,
+      field_names: `cur_stat_code`,
+      where_condition: `id = ${db.escape(id)}`,
+    };
+    console.log("query1",query);
+    // Use `getRecords` to fetch statuses matching the condition
+    const currentStatus = await getRecords((req = { query }), res, {
+      resultOnly: true,
+    });
+    console.log("currentStatus",currentStatus);
 
-    const currentStatCode = currentStatus[0]?.cur_stat_code;
+    const currentStatCode = currentStatus?.[0]?.cur_stat_code;
     console.log("currentStatCode",currentStatCode);
     // If the new `cur_stat_code` is 24, update the `dy_property` table
     if (currentStatCode == 24) {
       // Fetch the property ID (`prop_id`) for the transaction
-      const [transaction] = await connection.query(
-        "SELECT prop_id FROM dy_transactions WHERE id = ?",
-        [id]
-      );
+      
+      query = {
+        tbl_name: `dy_transactions`,
+        field_names: `prop_id`,
+        where_condition: `id = ${db.escape(id)}`,
+      };
+      console.log("query2",query);
+      // Use `getRecords` to fetch statuses matching the condition
+      const transaction = await getRecords((req = { query }), res, {
+        resultOnly: true,
+      });
+      console.log("transaction",transaction);
 
-      const propId = transaction[0]?.prop_id;
+      const propId = transaction?.[0]?.prop_id;
+      console.log("propId",propId);
 
       if (propId) {
         // Prepare the request body for updating `dy_property`
-        req.body = {
+        body = {
           tbl_name: "dy_property",
           field_values_pairs: { current_status: currentStatCode },
           where_condition: `id = ${db.escape(propId)}`,
         };
-            // Use a transaction for safety
-    await connection.beginTransaction();
-
+        console.log("body",body);
+        // Use a transaction for safety
+        await connection.beginTransaction();
 
         // Call the `updateRecords` utility function
-        await updateRecords(req, res);
-            // Commit the transaction
-    await connection.commit();
-
+         re = await updateRecords((req = { body }), res, {
+          resultOnly: true,
+        });
+        console.log("re",re);
+  
+        // Commit the transaction
+        await connection.commit();
       }
     }
-
 
     // Prepare dynamic field-value pairs for the update
     const fieldValuePairs = {};
@@ -645,23 +571,33 @@ const updateTask = async (req, res) => {
     const whereCondition = `id = ${db.escape(id)}`;
 
     // Construct the request body for the `updateRecords` utility function
-    req.body = {
+    body = {
       tbl_name: "dy_transactions",
       field_values_pairs: fieldValuePairs,
       where_condition: whereCondition,
     };
-        // Use a transaction for safety
-        await connection.beginTransaction();
-
+    console.log("body2",body);
+    // Use a transaction for safety
+    await connection.beginTransaction();
 
     // Call the `updateRecords` function to execute the update
-    await updateRecords(req, res);
-        // Commit the transaction
-        await connection.commit();
+    //const re2 = await updateRecords(req);
+    const re2 = await updateRecords((req = { body }), res, {
+      resultOnly: true,
+    });
+    console.log("re2",re2);
 
+    // Commit the transaction
+    await connection.commit();
+    // Return the results
+    res.status(200).json({
+      message: "Retrieved successfully.",
+      result: re, // Results are usually nested in the first index
+      r2: re2,
+    });
   } catch (error) {
-     // Rollback the transaction in case of an error
-     if (connection && connection.rollback) {
+    // Rollback the transaction in case of an error
+    if (connection && connection.rollback) {
       await connection.rollback();
     }
     // Log the error and send a 500 response
@@ -669,6 +605,8 @@ const updateTask = async (req, res) => {
     res.status(500).json({
       message: "Error updating transaction",
       error: error.message,
+      re1: re,
+      re2: re2,
     });
   } finally {
     // Release the database connection
@@ -676,12 +614,41 @@ const updateTask = async (req, res) => {
   }
 };
 
+const getTopCommunities = async (req, res) => {
+  const { city_id, rstatus = 1 } = req.query;
+
+  try {
+    if (!city_id) {
+      return res.status(400).json({ message: "city_id is required." });
+    }
+
+    const [results] = await db.query("CALL getTopCommunities(?, ?)", [
+      city_id,
+      rstatus,
+    ]);
+
+    if (!results || results.length === 0) {
+      return res.status(404).json({ message: "No communities found." });
+    }
+
+    res.status(200).json({
+      message: "Retrieved successfully.",
+      result: results[0], // Results are usually nested in the first index
+    });
+  } catch (error) {
+    console.error("Error in getRecords:", error);
+    return res
+      .status(500)
+      .json({ message: "Error getting records", error: error.message });
+  }
+};
+
 module.exports = {
-  addRmTask,
+  addRequest,
   showPropDetails,
   userActions,
   getTasks,
   getFmList,
   updateTask,
-  filterProperties,
+  getTopCommunities,
 };

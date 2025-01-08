@@ -655,7 +655,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
-  
   fetchStaticData,
   fetchCityList,
   fetchBuildersList,
@@ -696,9 +695,10 @@ const staticDataConfig = [
   {
     propertyDescription: ["st_prop_desc", "id,prop_desc"],
   },
+  {
+    maintenance: ["st_maintenance", "id,maintenance_type"],
+  },
 ];
-
-
 
 const PostPropertiesView = () => {
   const navigate = useNavigate();
@@ -712,7 +712,6 @@ const PostPropertiesView = () => {
     return () => clearTimeout(timer);
   }, []);
   const [formData, setFormData] = useState({
-   // state: "",
     city: "",
     builder: "",
     community: "",
@@ -726,14 +725,14 @@ const PostPropertiesView = () => {
     balcony: "",
     tenantType: "",
     foodPreferences: "",
-    rentalPrice: "",
+    rental_low: "",
+    rental_high: "",
     parking: "",
-    maintenance:"",
+    maintenance: "",
     images: [],
   });
 
   const [dropdownData, setDropdownData] = useState({
-   // stateList: [],
     cityList: [],
     builderList: [],
     communityList: [],
@@ -745,10 +744,10 @@ const PostPropertiesView = () => {
     foodPreference: [],
     parking: [],
     propertyDescription: [],
+    maintenance: [],
   });
 
   const [loading, setLoading] = useState({
-    //state: false,
     city: false,
     builder: false,
     community: false,
@@ -760,98 +759,37 @@ const PostPropertiesView = () => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [modalImage, setModalImage] = useState(null);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const [stateResponse, staticDataResponse] = await Promise.all([
-  //         fetchStateList( 'st_state', 'id,name'),
-          
-  //       ]);
-  //       setDropdownData((prev) => ({
-  //         ...prev,
-  //         stateList: stateResponse,
-  //              }));
-  //     } catch (err) {
-  //       console.error("Error fetching data:", err);
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const responses = await Promise.all(
+        const response = await fetchCityList("st_city", "id,name", {
+          rstatus: 1,
+        });
+        setDropdownData((prev) => ({ ...prev, cityList: response }));
+        await Promise.all(
           staticDataConfig.map(async (each) => {
             // Get the table name and field names from the staticDataConfig
             const value = Object.values(each)[0];
-            const key=Object.keys(each)[0]; // table name, field names
-            console.log("key",key)
+            const key = Object.keys(each)[0]; // table name, field names
             // Fetch the data using the values
-            const data = await fetchStaticData(value[0], value[1],{rstatus:1});
-            console.log(data);
-            
+            const data = await fetchStaticData(value[0], value[1], {
+              rstatus: 1,
+            });
+
             setDropdownData((prev) => ({
               ...prev,
               [key]: data, // Use the key to dynamically update the dropdownData state
             }));
             
-          //   if(key=="propertyType"){
-          //  setDropdownData((prev)=>
-
-          //  ({...prev,propertyType:data})
-          //  ) }
           })
         );
-      
-  
-      
       } catch (err) {
         console.error("Error fetching static data:", err);
       }
     };
-  
     fetchData();
   }, []);
-  // useEffect(() => {
-  //   fetchData(formData.homeType, setDropdownData, setLoading);
-  // });
   
-
-  useEffect(() => {
-    const fetchCities = async () => {
-      // if (!formData.state) return;
-      // setLoading((prev) => ({ ...prev, city: true }));
-      try {
-        const response = await fetchCityList("st_city","id,name",  { rstatus: 1 });
-        setDropdownData((prev) => ({ ...prev, cityList: response }));
-        
-      } catch (err) {
-        console.error("Error fetching city list:", err);
-      } finally {
-        setLoading((prev) => ({ ...prev, city: false }));
-      }
-    };
-    fetchCities();
-  })
-  //  [formData.state]);
-
-  // useEffect(() => {
-  //   const fetchBuilders = async () => {
-  //     if (!formData.city) return;
-  //     setLoading((prev) => ({ ...prev, builder: true }));
-  //     try {
-  //       const response = await fetchBuildersList('st_builder', 'id,name', { city_id: formData.city,rstatus:1 });
-  //       setDropdownData((prev) => ({ ...prev, builderList: response }));
-  //     } catch (err) {
-  //       console.error("Error fetching builder list:", err);
-  //     } finally {
-  //       setLoading((prev) => ({ ...prev, builder: false }));
-  //     }
-  //   };
-  //   fetchBuilders();
-  // }, [formData.city]);
-
   useEffect(() => {
     fetchBuilders(formData.city, setDropdownData, setLoading);
   }, [formData.city]);
@@ -870,21 +808,7 @@ const PostPropertiesView = () => {
       }));
       const previews = fileList.map((file) => URL.createObjectURL(file));
       setImagePreviews((prev) => [...prev, ...previews]);
-   // }
-    //  else if (name === "state") {
-    //   setFormData((prev) => ({
-    //     ...prev,
-    //     [name]: value,
-    //     city: "", // Reset city when state changes
-    //     builder: "", // Reset builder when state changes
-    //     community: "",
-    //   }));
-    //   setDropdownData((prev) => ({
-    //     ...prev,
-    //     cityList: [],
-    //     builderList: [],
-    //     communityList: [],
-    //   }));
+      
     } else if (name === "city") {
       setFormData((prev) => ({
         ...prev,
@@ -944,9 +868,7 @@ const PostPropertiesView = () => {
       // Skip validation for TowerNumber, FloorNumber, and FlatNumber if propertyType is 3
       if (
         formData.propertyType === 3 &&
-        (
-          field.name === "floorNumber" ||
-          field.name === "flatNumber")
+        (field.name === "floorNumber" || field.name === "flatNumber")
       ) {
         return; // Skip validation for these fields
       }
@@ -974,48 +896,27 @@ const PostPropertiesView = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // const response = await uploadProperty({
-      //   user_id: 1,
-      //   prop_type_id: formData.propertyType,
-      //   home_type_id: formData.bedrooms,
-      //   prop_desc_id: formData.propertyDescription,
-      //   community_id: formData.community,
       
-      //   no_baths: formData.bathrooms,
-      //   no_balconies: formData.balcony,
-      //   tenant_type_id: formData.tenantType,
-      //   tenant_eat_pref_id: formData.foodPreferences,
-      //   rental_low: 1,
-  
-      //   parking_count_id: formData.parking,
-      
-      //   tower_no: parseInt(formData.towerNumber),
-      //   floor_no: parseInt(formData.floorNumber),
-      //   flat_no: parseInt(formData.flatNumber),
-      
-      // });
       const response = await uploadProperty([
         1,
         formData.propertyType,
-       formData.bedrooms,
-         formData.propertyDescription,
+        formData.bedrooms,
+        formData.propertyDescription,
         formData.community,
-      
-        formData.bathrooms,
-       formData.balcony,
-       formData.tenantType,
-     formData.foodPreferences,
-       formData.rentalPrice,
-  
-      formData.parking,
-      formData.maintenance,
-         parseInt(formData.towerNumber),
-         formData.floorNumber,
-         parseInt(formData.flatNumber),
-      
-      ]);
 
-   
+        formData.bathrooms,
+        formData.balcony,
+        formData.tenantType,
+        formData.foodPreferences,
+        formData.rental_low,
+        formData.rental_high,
+
+        formData.parking,
+        formData.maintenance,
+        parseInt(formData.towerNumber),
+        formData.floorNumber,
+        parseInt(formData.flatNumber),
+      ]);
 
       console.log("Response:", response);
       alert("Form submitted successfully!");
@@ -1029,13 +930,7 @@ const PostPropertiesView = () => {
 
   const panels = [
     [
-      // {
-      //   label: "State",
-      //   name: "state",
-      //   options: dropdownData.stateList,
-      //   type: "dropdown",
-      //   displayKey: "name",
-      // },
+      
       {
         label: "City",
         name: "city",
@@ -1078,14 +973,12 @@ const PostPropertiesView = () => {
         type: "dropdown",
         displayKey: "home_type",
       },
-     
     ],
     [
       { label: "Tower/Unit Number", name: "towerNumber", type: "text" },
       { label: "Floor Number", name: "floorNumber", type: "number" },
       { label: "Flat Number", name: "flatNumber", type: "text" },
 
-     
       {
         label: "Bathrooms",
         name: "bathrooms",
@@ -1110,8 +1003,9 @@ const PostPropertiesView = () => {
       },
     ],
     [
-      { label: "Monthly Rental", name: "rentalPrice", type: "number" },
-      
+      { label: "Monthly Rental(Min)", name: "rental_low", type: "number" },
+      { label: "Monthly Rental(Max)", name: "rental_high", type: "number" },
+
       {
         label: "Tenant Type",
         name: "tenantType",
@@ -1126,7 +1020,13 @@ const PostPropertiesView = () => {
         type: "dropdown",
         displayKey: "eat_pref",
       },
-      {label: "Maintenance", name:"maintenance",type:"checkbox"},
+      {
+        label: "Maintenance",
+        name: "maintenance",
+        type: "dropdown",
+        options: dropdownData.maintenance,
+        displayKey: "maintenance_type",
+      },
 
       { label: "Upload Images", name: "images", type: "file" },
     ],
@@ -1156,21 +1056,6 @@ const PostPropertiesView = () => {
             accept="image/*"
             className="w-full p-2 border rounded-md"
           />
-        ) : input.type === "checkbox" ? (
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              name={input.name}
-              checked={formData[input.name] || false}
-              onChange={(e) =>
-                handleInputChange({
-                  target: { name: input.name, value: e.target.checked ? 1 : 2 },
-                })
-              }
-              className="mr-2"
-            />
-            <span>{input.label}</span>
-          </div>
         ) : (
           <input
             type={input.type}
@@ -1178,18 +1063,14 @@ const PostPropertiesView = () => {
             value={formData[input.name]}
             onChange={handleInputChange}
             className={`w-full p-2 border rounded-md ${
-              (
-                input.name === "floorNumber" ||
-                input.name === "flatNumber") &&
+              (input.name === "floorNumber" || input.name === "flatNumber") &&
               formData.propertyType === 3
                 ? "opacity-50 bg-gray-200 cursor-not-allowed"
                 : ""
             }`}
             placeholder={`Enter ${input.label}`}
             disabled={
-              (
-                input.name === "floorNumber" ||
-                input.name === "flatNumber") &&
+              (input.name === "floorNumber" || input.name === "flatNumber") &&
               formData.propertyType === 3
             }
           />
@@ -1199,7 +1080,6 @@ const PostPropertiesView = () => {
         )}
       </div>
     ));
-  
 
   return (
     <>
